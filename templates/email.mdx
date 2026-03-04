@@ -1,0 +1,314 @@
+---
+title: Email QR codes
+description: Generate QR codes that open pre-filled email composition windows
+---
+
+The Email template creates QR codes that open the user's default email client with pre-filled recipient, subject, and body text. This streamlines customer inquiries, feedback collection, and support requests by eliminating manual email composition.
+
+## How to create an email QR code
+
+1. Select the **Email** tab in the generator
+2. Enter the recipient email address (required)
+3. Add a subject line (optional but recommended)
+4. Add default body text (optional)
+5. Download and place on marketing materials, product packaging, or support documentation
+
+<Note>
+When scanned, the QR code opens the device's default email app (Gmail, Mail, Outlook, etc.) with all fields pre-populated. Users can edit the content before sending.
+</Note>
+
+## Email fields
+
+<ParamField path="emailData.to" type="string" required>
+  The recipient email address. This is the "To" field in the email that will be pre-filled.
+</ParamField>
+
+<ParamField path="emailData.subject" type="string">
+  The email subject line. Pre-filling this helps organize incoming emails and gives users context.
+</ParamField>
+
+<ParamField path="emailData.body" type="string">
+  The initial message body text. Can include instructions, templates, or default information.
+</ParamField>
+
+## Mailto URL format
+
+The generator uses the standard `mailto:` URL scheme that's supported by all email clients:
+
+```
+mailto:<recipient>?subject=<encoded-subject>&body=<encoded-body>
+```
+
+### Format components
+
+- **mailto:** - URL scheme prefix
+- **recipient** - Email address (not URL encoded)
+- **?** - Query string separator
+- **subject=** - Subject parameter (URL encoded)
+- **body=** - Body parameter (URL encoded)
+- **&** - Parameter separator
+
+### URL encoding
+
+The subject and body parameters are automatically URL encoded to handle special characters:
+
+- Spaces become `%20`
+- Line breaks become `%0A`
+- Special characters are encoded (e.g., `@` becomes `%40`)
+
+### Example formats
+
+<Tabs>
+  <Tab title="Customer inquiry">
+    ```
+    mailto:contacto@empresa.com?subject=Consulta%20de%20productos&body=Hola%2C%0A%0AMe%20gustaría%20más%20información%20sobre...
+    ```
+    
+    Decodes to:
+    - To: contacto@empresa.com
+    - Subject: Consulta de productos
+    - Body: Hola,\n\nMe gustaría más información sobre...
+  </Tab>
+  
+  <Tab title="Support request">
+    ```
+    mailto:support@company.com?subject=Technical%20Support%20Request&body=Issue%20description%3A%0A
+    ```
+    
+    Decodes to:
+    - To: support@company.com
+    - Subject: Technical Support Request
+    - Body: Issue description:\n
+  </Tab>
+  
+  <Tab title="Feedback form">
+    ```
+    mailto:feedback@app.com?subject=App%20Feedback&body=Rating%3A%20%0AComments%3A%20
+    ```
+    
+    Decodes to:
+    - To: feedback@app.com
+    - Subject: App Feedback
+    - Body: Rating: \nComments: 
+  </Tab>
+  
+  <Tab title="Simple contact">
+    ```
+    mailto:info@business.com
+    ```
+    
+    No subject or body, just opens email to the address
+  </Tab>
+</Tabs>
+
+## Use cases for quick email composition
+
+<Card title="Customer support" icon="headset">
+  Place on product packaging or user manuals so customers can quickly request help with pre-filled support request templates.
+</Card>
+
+<Card title="Feedback collection" icon="comment">
+  Add to apps, websites, or physical products to gather customer feedback with structured email templates.
+</Card>
+
+<Card title="Event inquiries" icon="calendar">
+  Include on event flyers or posters for booking inquiries with pre-filled event details in the subject line.
+</Card>
+
+<Card title="Sales inquiries" icon="shopping-cart">
+  Add to marketing materials, catalogs, or storefronts to generate qualified leads with context in the subject.
+</Card>
+
+<Card title="Job applications" icon="briefcase">
+  Include in job postings so applicants can send resumes with the correct position in the subject line.
+</Card>
+
+<Card title="Newsletter signups" icon="envelope">
+  Alternative to web forms for users to request newsletter subscriptions via email.
+</Card>
+
+## Implementation example
+
+Here's how the Email template generates mailto QR codes:
+
+<CodeGroup>
+```jsx QRGenerator.jsx
+// Email data state with recipient, subject, and body
+const [emailData, setEmailData] = useState({ 
+  to: '', 
+  subject: '', 
+  body: '' 
+});
+
+// QR value generation using mailto: URL scheme
+useEffect(() => {
+  switch (activeTab) {
+    case 'email':
+      setQrValue(
+        `mailto:${emailData.to}?subject=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`
+      );
+      break;
+    // ... other cases
+  }
+}, [activeTab, emailData]);
+```
+
+```jsx Form layout
+<div className="grid-2-cols">
+  {/* Recipient field - full width */}
+  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+    <label className="form-label">Destinatario</label>
+    <input 
+      type="text" 
+      value={emailData.to} 
+      onChange={(e) => setEmailData({ ...emailData, to: e.target.value })} 
+      placeholder="contacto@empresa.com" 
+    />
+  </div>
+  
+  {/* Subject field - full width */}
+  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+    <label className="form-label">Asunto</label>
+    <input 
+      type="text" 
+      value={emailData.subject} 
+      onChange={(e) => setEmailData({ ...emailData, subject: e.target.value })} 
+      placeholder="Consulta de servicios" 
+    />
+  </div>
+</div>
+```
+
+```jsx URL encoding
+// encodeURIComponent handles special characters
+const subject = encodeURIComponent(emailData.subject);
+const body = encodeURIComponent(emailData.body);
+
+// Construct mailto URL
+const mailtoUrl = `mailto:${emailData.to}?subject=${subject}&body=${body}`;
+```
+</CodeGroup>
+
+The implementation uses the `encodeURIComponent()` function to properly encode the subject and body parameters, ensuring special characters, spaces, and line breaks are handled correctly in the URL format.
+
+<Info>
+The Email template is located at lines 158-169 in `src/components/QRGenerator.jsx`. The state is initialized at line 13 with all fields as empty strings. The mailto URL generation is at line 39.
+</Info>
+
+## Best practices
+
+### Subject line strategies
+
+<Tabs>
+  <Tab title="Specific and contextual">
+    ```
+    ✓ "Product Inquiry - Model XYZ-123"
+    ✓ "Event Registration - Summer Conference 2024"
+    ✓ "Support Request - Order #45678"
+    ```
+    
+    Helps you categorize and filter incoming emails
+  </Tab>
+  
+  <Tab title="Department routing">
+    ```
+    ✓ "Sales Inquiry - [Customer Name]"
+    ✓ "Technical Support - [Product Name]"
+    ✓ "Partnership Opportunity"
+    ```
+    
+    Makes it easy to route to the right team
+  </Tab>
+  
+  <Tab title="Action-oriented">
+    ```
+    ✓ "Request a Quote"
+    ✓ "Schedule a Demo"
+    ✓ "Report an Issue"
+    ```
+    
+    Clear call-to-action for the recipient
+  </Tab>
+</Tabs>
+
+### Body text templates
+
+Provide helpful structure without being too restrictive:
+
+```
+✓ Good:
+Name:
+Company:
+Question:
+
+✓ Good:
+Please describe your issue:
+
+Order number (if applicable):
+
+✓ Avoid:
+[This is a very long pre-written message that users will have to delete...]
+```
+
+<Note>
+Keep body text minimal. Users should feel free to customize the message. Long pre-filled text may discourage sending.
+</Note>
+
+### Email address validation
+
+Ensure the recipient email is valid:
+
+```
+✓ Good: support@company.com
+✓ Good: firstname.lastname@domain.co.uk
+✓ Good: hello@my-business.com
+
+✗ Avoid: invalid@email (missing TLD)
+✗ Avoid: user name@domain.com (spaces)
+✗ Avoid: @domain.com (missing local part)
+```
+
+## Multiple recipients and CC/BCC
+
+While the current implementation supports a single recipient, the mailto scheme also supports multiple recipients, CC, and BCC:
+
+```
+mailto:first@example.com,second@example.com?cc=copy@example.com&bcc=hidden@example.com&subject=Meeting
+```
+
+### Format for multiple recipients
+
+- **Multiple To addresses**: Comma-separated (no spaces)
+- **CC**: Add `&cc=address@example.com`
+- **BCC**: Add `&bcc=address@example.com`
+
+<Info>
+To add multiple recipient support, modify the state to accept arrays or comma-separated values and update the mailto URL construction accordingly.
+</Info>
+
+## Platform compatibility
+
+The mailto URL scheme is supported on:
+
+- **iOS**: Opens default Mail app or configured email client
+- **Android**: Opens Gmail, Outlook, or default email app
+- **Desktop**: Opens default email client (Outlook, Mail, Thunderbird, etc.)
+- **Web**: May prompt user to select email client
+
+<Note>
+Users who primarily use webmail (Gmail, Outlook.com) through browsers may need to configure their browser to handle mailto links, or they'll be prompted to select an application.
+</Note>
+
+## Privacy considerations
+
+<Card title="Email visibility" icon="eye">
+  The recipient email address is visible in the QR code when decoded. Avoid using personal email addresses for public QR codes.
+</Card>
+
+<Card title="Spam protection" icon="shield">
+  Use dedicated contact emails (like support@, info@) rather than personal addresses to manage potential spam.
+</Card>
+
+<Card title="User control" icon="user-check">
+  Users can modify all fields before sending. Never collect sensitive information through pre-filled email QR codes.
+</Card>

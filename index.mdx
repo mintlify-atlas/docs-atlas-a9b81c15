@@ -1,97 +1,189 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Generador QR Pro Documentation"
+mode: "custom"
 ---
 
-## Setting up
+<div className="relative w-full py-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-900 dark:via-purple-900 dark:to-pink-900 overflow-hidden">
+  <div className="absolute inset-0 bg-black/30 dark:bg-black/50"></div>
+  <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <div className="lg:col-span-7 text-center lg:text-left">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+          Create Beautiful QR Codes in Seconds
+        </h1>
+        <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto lg:mx-0 mb-8">
+          Generate, customize, and export professional QR codes with multiple templates, logo support, and premium styling options. Built with React and modern design principles.
+        </p>
+        <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+          <a 
+            href="/quickstart" 
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-indigo-600 dark:text-indigo-700 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-200 transition-colors shadow-lg"
+          >
+            Get Started
+          </a>
+          <a 
+            href="/introduction" 
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white font-semibold rounded-lg border border-white/30 hover:bg-white/20 transition-colors"
+          >
+            View Documentation
+          </a>
+        </div>
+      </div>
+      <div className="lg:col-span-5 hidden lg:flex justify-center items-center">
+        <div className="w-72 h-72 bg-white rounded-3xl shadow-2xl flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform duration-300">
+          <svg viewBox="0 0 200 200" className="w-64 h-64">
+            <rect x="0" y="0" width="200" height="200" fill="white" />
+            <rect x="10" y="10" width="30" height="30" fill="#4f46e5" />
+            <rect x="50" y="10" width="10" height="10" fill="#4f46e5" />
+            <rect x="70" y="10" width="10" height="10" fill="#4f46e5" />
+            <rect x="90" y="10" width="10" height="10" fill="#4f46e5" />
+            <rect x="160" y="10" width="30" height="30" fill="#4f46e5" />
+            <rect x="10" y="50" width="10" height="10" fill="#4f46e5" />
+            <rect x="30" y="50" width="10" height="10" fill="#4f46e5" />
+            <rect x="160" y="50" width="10" height="10" fill="#4f46e5" />
+            <rect x="180" y="50" width="10" height="10" fill="#4f46e5" />
+            <rect x="10" y="160" width="30" height="30" fill="#4f46e5" />
+            <rect x="50" y="170" width="10" height="10" fill="#4f46e5" />
+            <rect x="160" y="160" width="30" height="30" fill="#4f46e5" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-4">
+    Quick start
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Get up and running with Generador QR Pro in just a few steps
+  </p>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+  <Steps>
+    <Step title="Clone the repository">
+      Clone the Generador QR Pro repository to your local machine:
+      
+      ```bash
+      git clone https://github.com/WaltherFgs/generador_qr.git
+      cd generador_qr
+      ```
+    </Step>
+    
+    <Step title="Install dependencies">
+      Install the required npm packages:
+      
+      ```bash
+      npm install
+      ```
+      
+      The project uses React 19, Vite, qrcode.react, and lucide-react for icons.
+    </Step>
+    
+    <Step title="Start the development server">
+      Launch the local development server:
+      
+      ```bash
+      npm run dev
+      ```
+      
+      Open your browser to `http://localhost:5173` to see the QR generator in action.
+    </Step>
+    
+    <Step title="Create your first QR code">
+      Select a template (URL, WiFi, vCard, or Email), enter your data, customize the colors and styling, then export as PNG or SVG.
+    </Step>
+  </Steps>
+</div>
 
-## Make it yours
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-4">
+    Explore by feature
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Discover what makes Generador QR Pro powerful and flexible
+  </p>
 
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
+  <CardGroup cols={2}>
     <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+      title="QR templates"
+      icon="grid"
+      href="/templates/url"
+    >
+      Generate QR codes for URLs, WiFi networks, contact cards (vCard), and email messages with specialized input forms.
+    </Card>
+    <Card
+      title="Color customization"
+      icon="palette"
+      href="/customization/colors"
+    >
+      Customize foreground and background colors with a live preview to match your brand identity.
+    </Card>
+    <Card
+      title="Logo integration"
+      icon="image"
+      href="/customization/logo"
+    >
+      Upload and embed your logo in the center of QR codes with automatic error correction for reliable scanning.
+    </Card>
+    <Card
+      title="Export options"
+      icon="download"
+      href="/customization/export"
+    >
+      Download your QR codes as high-resolution PNG images or scalable SVG vector files.
+    </Card>
+  </CardGroup>
+</div>
 
-## Create beautiful pages
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-4">
+    Developer resources
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Everything you need to understand and extend Generador QR Pro
+  </p>
 
-Everything you need to create world-class documentation.
+  <CardGroup cols={3}>
+    <Card
+      title="Components"
+      icon="code"
+      href="/components/qr-generator"
+    >
+      Explore the QRGenerator component architecture and props API
+    </Card>
+    <Card
+      title="Examples"
+      icon="lightbulb"
+      href="/examples/basic"
+    >
+      See real-world usage examples and integration patterns
+    </Card>
+    <Card
+      title="Installation"
+      icon="rocket"
+      href="/installation"
+    >
+      Set up the development environment and build configuration
+    </Card>
+  </CardGroup>
+</div>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<div className="mt-20 mb-16 max-w-5xl mx-auto px-6">
+  <div className="relative rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-800 dark:to-purple-800 p-8 sm:p-12 overflow-hidden border border-indigo-500/20 dark:border-indigo-400/20">
+    <div className="relative z-10 text-center">
+      <h2 className="text-2xl sm:text-3xl font-semibold text-white mb-4">
+        Ready to create amazing QR codes?
+      </h2>
+      <p className="text-base text-white/90 mb-6 max-w-2xl mx-auto">
+        Start building with Generador QR Pro today. Follow our quickstart guide to generate your first QR code in minutes.
+      </p>
+      <a 
+        href="/quickstart" 
+        className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-indigo-600 dark:text-indigo-700 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-200 transition-colors shadow-lg"
+      >
+        Get Started Now
+      </a>
+    </div>
+  </div>
+</div>

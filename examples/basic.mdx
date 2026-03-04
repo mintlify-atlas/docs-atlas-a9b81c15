@@ -1,0 +1,234 @@
+---
+title: Basic usage examples
+description: Learn how to generate simple QR codes with default settings for common use cases like URLs, WiFi, and contacts
+---
+
+## Simple URL QR code generation
+
+The most common use case is generating a QR code for a URL. The QRGenerator component starts with a default URL and uses the `qrcode.react` library.
+
+<CodeGroup>
+```jsx Component Usage
+import QRGenerator from './components/QRGenerator';
+
+function App() {
+  return (
+    <div className="container">
+      <QRGenerator />
+    </div>
+  );
+}
+```
+
+```jsx URL State
+const [activeTab, setActiveTab] = useState('url');
+const [urlData, setUrlData] = useState('https://www.bbc.com/mundo');
+
+// The URL is directly used as the QR value
+setQrValue(urlData || 'https://');
+```
+</CodeGroup>
+
+<Tip>
+The component defaults to the URL tab on load with `activeTab='url'` at line 7 in QRGenerator.jsx
+</Tip>
+
+### Expected output
+
+When you enter a URL like `https://example.com`, the QR code is generated in real-time using the `QRCodeSVG` component with these default settings:
+
+- **Size**: 280px
+- **Foreground color**: `#0f172a` (dark slate)
+- **Background color**: `#ffffff` (white)
+- **Error correction**: Level H (30% damage tolerance)
+
+## Basic WiFi QR code with WPA encryption
+
+Create a WiFi QR code that users can scan to automatically connect to your network.
+
+<Steps>
+  <Step title="Set WiFi data state">
+    The component uses a structured state object for WiFi credentials:
+    
+    ```jsx
+    const [wifiData, setWifiData] = useState({ 
+      ssid: '', 
+      password: '', 
+      encryption: 'WPA', 
+      hidden: false 
+    });
+    ```
+  </Step>
+  
+  <Step title="Generate WiFi format string">
+    The QR value is formatted according to the WiFi QR code standard:
+    
+    ```jsx
+    setQrValue(
+      `WIFI:S:${wifiData.ssid};T:${wifiData.encryption};P:${wifiData.password};H:${wifiData.hidden};;`
+    );
+    ```
+  </Step>
+  
+  <Step title="Example WiFi QR code">
+    ```jsx
+    // User fills in the form:
+    // SSID: "CoffeeShop-Guest"
+    // Password: "welcome2023"
+    // Encryption: "WPA" (default)
+    
+    // Generated QR value:
+    // WIFI:S:CoffeeShop-Guest;T:WPA;P:welcome2023;H:false;;
+    ```
+  </Step>
+</Steps>
+
+<Note>
+The encryption options are WPA/WPA2 (default), WEP, or no password. See line 129 in QRGenerator.jsx for the select options.
+</Note>
+
+## Simple contact card with minimal fields
+
+Generate a vCard QR code for sharing contact information. The component supports the vCard 3.0 format.
+
+```jsx
+const [vcardData, setVcardData] = useState({ 
+  firstName: '', 
+  lastName: '', 
+  phone: '', 
+  email: '', 
+  company: '' 
+});
+
+// vCard format generation (line 35-36)
+const vcard = `BEGIN:VCARD
+VERSION:3.0
+N:${vcardData.lastName};${vcardData.firstName};;;
+FN:${vcardData.firstName} ${vcardData.lastName}
+ORG:${vcardData.company}
+TEL;TYPE=CELL:${vcardData.phone}
+EMAIL:${vcardData.email}
+END:VCARD`;
+```
+
+### Minimal contact example
+
+<CodeGroup>
+```jsx Minimal vCard
+// Fill in just the essential fields:
+firstName: "Juan"
+lastName: "Pérez"
+phone: "+1 234 567 8900"
+
+// Generated vCard:
+BEGIN:VCARD
+VERSION:3.0
+N:Pérez;Juan;;;
+FN:Juan Pérez
+ORG:
+TEL;TYPE=CELL:+1 234 567 8900
+EMAIL:
+END:VCARD
+```
+
+```jsx Complete vCard
+// All fields populated:
+firstName: "Juan"
+lastName: "Pérez"
+phone: "+1 234 567 8900"
+email: "juan@ejemplo.com"
+company: "Tech Solutions Inc"
+
+// Generates a complete contact card
+```
+</CodeGroup>
+
+## Using default colors and settings
+
+The QRGenerator component comes with carefully chosen defaults for professional-looking QR codes.
+
+<Tabs>
+  <Tab title="Default colors">
+    ```jsx
+    const [fgColor, setFgColor] = useState('#0f172a'); // Dark slate
+    const [bgColor, setBgColor] = useState('#ffffff'); // White
+    ```
+    
+    These colors provide excellent contrast for scanning reliability.
+  </Tab>
+  
+  <Tab title="Default size">
+    ```jsx
+    const [size, setSize] = useState(280);
+    ```
+    
+    280px provides a good balance between screen display and scanability.
+  </Tab>
+  
+  <Tab title="Default error correction">
+    ```jsx
+    const [level, setLevel] = useState('H');
+    ```
+    
+    Level H (High) allows up to 30% of the QR code to be damaged while remaining scannable.
+  </Tab>
+</Tabs>
+
+## Quick PNG export
+
+Export your QR code as a high-resolution PNG image with a single click.
+
+<Steps>
+  <Step title="Component renders hidden canvas">
+    The QRGenerator uses a hidden `QRCodeCanvas` component at 2x resolution for PNG export (line 247-259):
+    
+    ```jsx
+    <div style={{ display: 'none' }}>
+      <QRCodeCanvas
+        value={qrValue}
+        size={size * 2} // High resolution for PNG
+        level={logoUrl ? 'H' : level}
+        bgColor={bgColor}
+        fgColor={fgColor}
+        includeMargin={true}
+      />
+    </div>
+    ```
+  </Step>
+  
+  <Step title="PNG download handler">
+    The download function extracts the canvas and converts it to PNG (line 47-58):
+    
+    ```jsx
+    const handleDownloadPNG = () => {
+      const canvas = qrRef.current?.querySelector('canvas');
+      if (!canvas) return;
+
+      const pngUrl = canvas
+        .toDataURL("image/png")
+        .replace("image/png", "image/octet-stream");
+      
+      let downloadLink = document.createElement("a");
+      downloadLink.href = pngUrl;
+      downloadLink.download = "qr-premium.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    };
+    ```
+  </Step>
+  
+  <Step title="Click the PNG button">
+    ```jsx
+    <button className="btn btn-primary" onClick={handleDownloadPNG}>
+      <Download size={18} /> PNG
+    </button>
+    ```
+    
+    The file is saved as `qr-premium.png` at 560x560px resolution (2x the display size).
+  </Step>
+</Steps>
+
+<Warning>
+Make sure you have content in the QR code before attempting to download. The component checks for a canvas element and returns early if none exists.
+</Warning>

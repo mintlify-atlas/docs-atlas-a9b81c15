@@ -1,0 +1,140 @@
+---
+title: URL/Link QR codes
+description: Create QR codes that open web pages and links when scanned
+---
+
+The URL template is the most common type of QR code. When scanned, it opens a web page in the user's browser, making it perfect for marketing materials, product packaging, and digital campaigns.
+
+## How to create a URL QR code
+
+1. Select the **URL** tab in the generator
+2. Enter your destination URL in the content field
+3. Customize the appearance (optional)
+4. Download your QR code as PNG or SVG
+
+<Note>
+The URL field accepts any valid web address. Make sure to include the protocol (https:// or http://) for proper redirection.
+</Note>
+
+## Input field details
+
+The URL template uses a single text input field that stores the destination URL:
+
+<ParamField path="urlData" type="string" default="https://www.bbc.com/mundo">
+  The complete URL that users will be redirected to when they scan the QR code. This field is managed by the `urlData` state and updates in real-time as you type.
+</ParamField>
+
+### Default behavior
+
+The generator initializes with a default URL (`https://www.bbc.com/mundo`) so you can see a preview immediately. If the field is empty, the QR code will default to `https://` as a fallback.
+
+## Example URLs and use cases
+
+<Tabs>
+  <Tab title="Marketing campaigns">
+    Link to landing pages, promotional offers, or campaign-specific URLs:
+    
+    ```
+    https://yourstore.com/summer-sale
+    https://example.com/promo?ref=qr
+    https://landing.page/special-offer
+    ```
+  </Tab>
+  
+  <Tab title="Product information">
+    Direct customers to product details, manuals, or support pages:
+    
+    ```
+    https://company.com/products/model-123
+    https://support.example.com/manual/item-456
+    https://docs.company.com/getting-started
+    ```
+  </Tab>
+  
+  <Tab title="Social media">
+    Link to your social media profiles or specific posts:
+    
+    ```
+    https://instagram.com/yourprofile
+    https://linkedin.com/company/yourcompany
+    https://youtube.com/watch?v=your-video-id
+    ```
+  </Tab>
+  
+  <Tab title="Event registration">
+    Direct attendees to registration forms or event details:
+    
+    ```
+    https://eventbrite.com/e/your-event-id
+    https://yoursite.com/register/conference-2024
+    https://forms.google.com/your-form-id
+    ```
+  </Tab>
+</Tabs>
+
+## Best practices for URL QR codes
+
+<Card title="Use short, memorable URLs" icon="link">
+  Long URLs create more complex QR codes that may be harder to scan. Consider using URL shorteners or custom domains for cleaner codes.
+</Card>
+
+<Card title="Always test before printing" icon="check">
+  Scan your QR code with multiple devices before mass production to ensure the URL is correct and loads properly.
+</Card>
+
+<Card title="Use HTTPS when possible" icon="lock">
+  Secure URLs (HTTPS) provide better trust signals and are required by some browsers for certain features.
+</Card>
+
+<Card title="Consider URL parameters" icon="tag">
+  Add tracking parameters (UTM codes) to measure campaign performance:
+  ```
+  https://site.com?utm_source=qr&utm_medium=print&utm_campaign=summer2024
+  ```
+</Card>
+
+## Implementation example
+
+Here's how the URL template generates the QR value in the source code:
+
+<CodeGroup>
+```jsx QRGenerator.jsx
+// URL data state
+const [urlData, setUrlData] = useState('https://www.bbc.com/mundo');
+
+// QR value generation
+useEffect(() => {
+  switch (activeTab) {
+    case 'url':
+      setQrValue(urlData || 'https://');
+      break;
+    // ... other cases
+  }
+}, [activeTab, urlData]);
+
+// Form input
+<div className="form-group">
+  <label className="form-label">Contenido / URL</label>
+  <input 
+    type="text" 
+    value={urlData} 
+    onChange={(e) => setUrlData(e.target.value)} 
+    placeholder="https://..." 
+  />
+</div>
+```
+
+```jsx State management
+// The URL template uses simple string state
+const [urlData, setUrlData] = useState('https://www.bbc.com/mundo');
+
+// Direct mapping to QR value
+setQrValue(urlData || 'https://');
+```
+</CodeGroup>
+
+The implementation is straightforward: the `urlData` state directly becomes the QR code value. If empty, it defaults to `https://` to maintain a valid QR code format.
+
+<Info>
+The URL template is located at line 109-114 in `src/components/QRGenerator.jsx` and uses a single text input controlled by the `urlData` state (line 10).
+</Info>

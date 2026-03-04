@@ -1,0 +1,491 @@
+---
+title: Installation
+description: Complete installation guide for Generador QR Pro with detailed setup instructions and project structure overview
+---
+
+# Installation
+
+This guide provides comprehensive instructions for installing and setting up Generador QR Pro for development. Whether you're contributing to the project or customizing it for your needs, this guide covers everything you need to know.
+
+## Prerequisites
+
+Before installing Generador QR Pro, ensure your development environment meets these requirements:
+
+### Node.js and npm
+
+Generador QR Pro requires Node.js version 16 or higher.
+
+<CodeGroup>
+  ```bash npm
+  # Check your current Node.js version
+  node --version
+  
+  # Check your npm version
+  npm --version
+  ```
+  
+  ```bash yarn
+  # Check your current Node.js version
+  node --version
+  
+  # Check your yarn version
+  yarn --version
+  ```
+  
+  ```bash pnpm
+  # Check your current Node.js version
+  node --version
+  
+  # Check your pnpm version
+  pnpm --version
+  ```
+</CodeGroup>
+
+<Info>
+  If you don't have Node.js installed, download it from [nodejs.org](https://nodejs.org/). We recommend using the LTS (Long Term Support) version.
+</Info>
+
+### Git
+
+You'll need Git to clone the repository:
+
+```bash
+git --version
+```
+
+If Git is not installed, download it from [git-scm.com](https://git-scm.com/).
+
+## Clone the repository
+
+Clone the Generador QR Pro repository to your local machine:
+
+```bash
+git clone <repository-url>
+cd generador_qr
+```
+
+<Tip>
+  Replace `<repository-url>` with the actual URL of the repository you're cloning from.
+</Tip>
+
+## Install dependencies
+
+Install all required npm packages using your preferred package manager:
+
+<CodeGroup>
+  ```bash npm
+  npm install
+  ```
+  
+  ```bash yarn
+  yarn install
+  ```
+  
+  ```bash pnpm
+  pnpm install
+  ```
+</CodeGroup>
+
+This will install all dependencies listed in `package.json`, including:
+
+**Core dependencies:**
+- `react@^19.2.0` - React library
+- `react-dom@^19.2.0` - React DOM renderer
+- `qrcode.react@^4.2.0` - QR code generation library
+- `lucide-react@^0.576.0` - Icon library
+
+**Development dependencies:**
+- `vite@^7.3.1` - Build tool and dev server
+- `@vitejs/plugin-react@^5.1.1` - Vite plugin for React
+- `eslint@^9.39.1` - JavaScript linter
+- ESLint plugins for React development
+
+## Available npm scripts
+
+Generador QR Pro includes several npm scripts for development, building, and maintenance. All scripts are defined in `package.json`.
+
+### Development server
+
+Start the Vite development server with hot module replacement:
+
+<CodeGroup>
+  ```bash npm
+  npm run dev
+  ```
+  
+  ```bash yarn
+  yarn dev
+  ```
+  
+  ```bash pnpm
+  pnpm dev
+  ```
+</CodeGroup>
+
+**What this does:**
+- Starts a local development server (usually on `http://localhost:5173`)
+- Enables Hot Module Replacement (HMR) for instant updates
+- Watches for file changes and rebuilds automatically
+- Provides detailed error messages in the browser
+
+<Info>
+  The development server runs the `vite` command, which starts the Vite dev server with all optimizations for React development.
+</Info>
+
+### Build for production
+
+Create an optimized production build:
+
+<CodeGroup>
+  ```bash npm
+  npm run build
+  ```
+  
+  ```bash yarn
+  yarn build
+  ```
+  
+  ```bash pnpm
+  pnpm build
+  ```
+</CodeGroup>
+
+**What this does:**
+- Runs the `vite build` command
+- Compiles and bundles all source code
+- Optimizes assets (minification, tree-shaking, code splitting)
+- Outputs production-ready files to the `dist/` directory
+
+### Lint code
+
+Run ESLint to check code quality and consistency:
+
+<CodeGroup>
+  ```bash npm
+  npm run lint
+  ```
+  
+  ```bash yarn
+  yarn lint
+  ```
+  
+  ```bash pnpm
+  pnpm lint
+  ```
+</CodeGroup>
+
+**What this does:**
+- Runs `eslint .` to check all JavaScript/JSX files
+- Reports code quality issues, potential bugs, and style violations
+- Uses the ESLint configuration from `eslint.config.js`
+- Includes React-specific rules via `eslint-plugin-react-hooks` and `eslint-plugin-react-refresh`
+
+### Preview production build
+
+Preview the production build locally:
+
+<CodeGroup>
+  ```bash npm
+  npm run preview
+  ```
+  
+  ```bash yarn
+  yarn preview
+  ```
+  
+  ```bash pnpm
+  pnpm preview
+  ```
+</CodeGroup>
+
+**What this does:**
+- Runs `vite preview` to serve the production build
+- Starts a local static server for the `dist/` directory
+- Useful for testing the production build before deployment
+- Typically runs on `http://localhost:4173`
+
+<Warning>
+  You must run `npm run build` before running `npm run preview`, as it serves the contents of the `dist/` directory.
+</Warning>
+
+## Project structure
+
+Generador QR Pro follows a standard Vite + React project structure:
+
+```
+generador_qr/
+├── public/               # Static assets
+│   └── vite.svg         # Vite logo
+├── src/                 # Source code
+│   ├── assets/          # Project assets
+│   │   └── react.svg    # React logo
+│   ├── components/      # React components
+│   │   └── QRGenerator.jsx  # Main QR generator component
+│   ├── App.jsx          # Root App component
+│   ├── App.css          # App-specific styles
+│   ├── index.css        # Global styles
+│   └── main.jsx         # Application entry point
+├── index.html           # HTML entry point
+├── package.json         # Project metadata and dependencies
+├── vite.config.js       # Vite configuration
+├── eslint.config.js     # ESLint configuration
+└── README.md            # Project README
+```
+
+### Key files explained
+
+#### `src/main.jsx`
+
+The application entry point that renders the root React component:
+
+```jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+```
+
+#### `src/App.jsx`
+
+The root component that provides the application structure:
+
+```jsx
+import React from 'react';
+import QRGenerator from './components/QRGenerator';
+
+function App() {
+  return (
+    <div className="container animate-fade-in">
+      <header className="header">
+        <h1 className="title">Generador QR Pro</h1>
+        <p className="subtitle">Crea, personaliza y descarga códigos QR con un diseño premium al instante.</p>
+      </header>
+      
+      <main>
+        <QRGenerator />
+      </main>
+    </div>
+  );
+}
+
+export default App;
+```
+
+#### `src/components/QRGenerator.jsx`
+
+The main component containing all QR generation logic. Key features:
+
+- **State management**: Uses React hooks (`useState`, `useRef`, `useEffect`) to manage QR data, customization, and active template
+- **Four templates**: URL, WiFi, vCard, and Email with dedicated input forms
+- **Real-time generation**: `useEffect` hook updates QR value whenever data or template changes
+- **Dual rendering**: Uses both `QRCodeSVG` (for display and vector export) and `QRCodeCanvas` (for high-res PNG export)
+- **Logo support**: Allows custom logo upload with automatic Level H error correction
+- **Export functions**: `handleDownloadPNG()` and `handleDownloadSVG()` for different export formats
+
+#### `vite.config.js`
+
+Vite configuration with React plugin:
+
+```javascript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})
+```
+
+#### `index.html`
+
+The HTML entry point that loads the Vite/React application:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generador QR Pro</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+```
+
+## Development workflow
+
+Here's the recommended workflow for developing with Generador QR Pro:
+
+<Steps>
+  <Step title="Start the development server">
+    ```bash
+    npm run dev
+    ```
+    
+    This starts the Vite dev server with HMR enabled.
+  </Step>
+  
+  <Step title="Make your changes">
+    Edit files in the `src/` directory. Changes will be reflected instantly in the browser thanks to Vite's HMR.
+    
+    - Component logic: `src/components/QRGenerator.jsx`
+    - Styles: `src/index.css` and `src/App.css`
+    - App structure: `src/App.jsx`
+  </Step>
+  
+  <Step title="Check code quality">
+    ```bash
+    npm run lint
+    ```
+    
+    Fix any ESLint warnings or errors before committing.
+  </Step>
+  
+  <Step title="Test production build">
+    ```bash
+    npm run build
+    npm run preview
+    ```
+    
+    Verify that your changes work correctly in the production build.
+  </Step>
+</Steps>
+
+## Understanding QR code generation
+
+Generador QR Pro uses the `qrcode.react` library, which provides two components:
+
+### QRCodeSVG
+
+Used for display and vector export:
+
+```jsx
+<QRCodeSVG
+  value={qrValue}
+  size={280}
+  level="H"
+  bgColor="#ffffff"
+  fgColor="#0f172a"
+  includeMargin={true}
+  imageSettings={{
+    src: logoUrl,
+    height: 280 * 0.22,
+    width: 280 * 0.22,
+    excavate: true,
+  }}
+/>
+```
+
+### QRCodeCanvas
+
+Used for high-resolution PNG export:
+
+```jsx
+<QRCodeCanvas
+  value={qrValue}
+  size={560}  // 2x for high resolution
+  level="H"
+  bgColor="#ffffff"
+  fgColor="#0f172a"
+  includeMargin={true}
+  imageSettings={{
+    src: logoUrl,
+    height: 560 * 0.22,
+    width: 560 * 0.22,
+    excavate: true,
+  }}
+/>
+```
+
+<Info>
+  The `excavate: true` option removes QR modules behind the logo to ensure the code remains scannable. This is why Level H error correction (30%) is used with logos.
+</Info>
+
+## Environment configuration
+
+Generador QR Pro uses Vite's built-in environment variable support. If you need to add environment-specific configuration:
+
+1. Create `.env` files:
+   - `.env` - Default environment variables
+   - `.env.local` - Local overrides (git-ignored)
+   - `.env.production` - Production-specific variables
+
+2. Prefix variables with `VITE_` to expose them to your app:
+   ```
+   VITE_API_URL=https://api.example.com
+   ```
+
+3. Access in your code:
+   ```javascript
+   const apiUrl = import.meta.env.VITE_API_URL
+   ```
+
+## Troubleshooting
+
+### Module not found errors
+
+If you encounter module resolution errors:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Vite port already in use
+
+Vite will automatically use the next available port. Check your terminal for the actual URL, or specify a custom port in `vite.config.js`:
+
+```javascript
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3000,
+  },
+})
+```
+
+### ESLint errors
+
+If ESLint reports errors, you can:
+
+1. Fix them manually based on the error messages
+2. Use auto-fix for some issues: `npx eslint . --fix`
+3. Temporarily disable specific rules in `eslint.config.js` (not recommended)
+
+### Build fails
+
+If the production build fails:
+
+1. Ensure all dependencies are installed: `npm install`
+2. Check for TypeScript errors (if using TypeScript)
+3. Clear Vite cache: `rm -rf node_modules/.vite`
+4. Try building again: `npm run build`
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Customization" icon="palette" href="/customization/colors">
+    Learn how to customize colors, logos, quality settings, and export options
+  </Card>
+  
+  <Card title="Components" icon="puzzle" href="/components/qr-generator">
+    Explore the QRGenerator component architecture and props API
+  </Card>
+  
+  <Card title="QR Templates" icon="qrcode" href="/templates/url">
+    Learn about URL, WiFi, vCard, and Email QR code templates
+  </Card>
+  
+  <Card title="Examples" icon="code" href="/examples/basic">
+    See real-world usage examples and integration patterns
+  </Card>
+</CardGroup>

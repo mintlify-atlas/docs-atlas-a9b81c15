@@ -1,0 +1,210 @@
+---
+title: WiFi network QR codes
+description: Generate QR codes for instant WiFi network connection without typing passwords
+---
+
+The WiFi template creates QR codes that automatically connect users to your wireless network when scanned. This eliminates the need to manually type network names and passwords, making it perfect for guest networks, offices, cafes, and events.
+
+## How to create a WiFi QR code
+
+1. Select the **WiFi** tab in the generator
+2. Enter your network name (SSID)
+3. Enter the network password
+4. Select the security type (WPA/WPA2, WEP, or no password)
+5. Download your QR code and place it where guests can scan it
+
+<Note>
+Most modern smartphones can scan WiFi QR codes directly from their camera app without requiring additional software.
+</Note>
+
+## Required fields
+
+<ParamField path="wifiData.ssid" type="string" required>
+  The name of your WiFi network (Service Set Identifier). This is the network name that appears in the WiFi list on devices.
+</ParamField>
+
+<ParamField path="wifiData.password" type="string">
+  The network password. Leave empty if your network has no password (open network).
+</ParamField>
+
+<ParamField path="wifiData.encryption" type="enum" default="WPA">
+  The security protocol used by your network:
+  - `WPA` - WPA/WPA2 (most common, recommended)
+  - `WEP` - WEP (older, less secure)
+  - `nopass` - No password (open network)
+</ParamField>
+
+<ParamField path="wifiData.hidden" type="boolean" default="false">
+  Whether the network is hidden (doesn't broadcast its SSID). Most networks should leave this as `false`.
+</ParamField>
+
+## WiFi QR code format
+
+The generator uses the standard WiFi QR code format that's recognized by iOS, Android, and other devices:
+
+```
+WIFI:S:<SSID>;T:<encryption>;P:<password>;H:<hidden>;;
+```
+
+### Format breakdown
+
+- **S:** Network name (SSID)
+- **T:** Authentication type (WPA, WEP, or nopass)
+- **P:** Network password
+- **H:** Hidden network flag (true/false)
+- **;;** Double semicolon terminates the string
+
+### Example formats
+
+<Tabs>
+  <Tab title="WPA/WPA2 network">
+    ```
+    WIFI:S:MyHomeWiFi;T:WPA;P:SecurePassword123;H:false;;
+    ```
+    Standard secured network with WPA2 encryption
+  </Tab>
+  
+  <Tab title="Open network">
+    ```
+    WIFI:S:GuestNetwork;T:nopass;P:;H:false;;
+    ```
+    Public network with no password required
+  </Tab>
+  
+  <Tab title="Hidden network">
+    ```
+    WIFI:S:HiddenOffice;T:WPA;P:OfficePass2024;H:true;;
+    ```
+    Hidden network that doesn't broadcast its SSID
+  </Tab>
+</Tabs>
+
+## Use cases and scanning instructions
+
+<Card title="Guest WiFi in homes" icon="home">
+  Print and frame a WiFi QR code near your entrance so guests can easily connect without asking for the password.
+</Card>
+
+<Card title="Coffee shops and restaurants" icon="coffee">
+  Display WiFi QR codes on tables, menus, or receipts to provide instant customer access.
+</Card>
+
+<Card title="Office visitor networks" icon="building">
+  Place QR codes in reception areas or conference rooms for easy guest network access.
+</Card>
+
+<Card title="Events and conferences" icon="users">
+  Share event WiFi access through QR codes on badges, signage, or printed materials.
+</Card>
+
+### How to scan a WiFi QR code
+
+**iOS (iPhone/iPad):**
+1. Open the Camera app
+2. Point at the QR code
+3. Tap the WiFi notification banner that appears
+4. Tap "Join" to connect
+
+**Android:**
+1. Open the Camera app or WiFi settings
+2. Look for "Scan QR code" option in WiFi settings
+3. Point at the QR code
+4. Tap "Connect" when prompted
+
+<Info>
+Some older Android devices may require a third-party QR scanner app that supports WiFi codes.
+</Info>
+
+## Implementation example
+
+Here's how the WiFi template works in the source code:
+
+<CodeGroup>
+```jsx QRGenerator.jsx
+// WiFi data state with all fields
+const [wifiData, setWifiData] = useState({ 
+  ssid: '', 
+  password: '', 
+  encryption: 'WPA', 
+  hidden: false 
+});
+
+// QR value generation using WiFi format
+useEffect(() => {
+  switch (activeTab) {
+    case 'wifi':
+      setQrValue(
+        `WIFI:S:${wifiData.ssid};T:${wifiData.encryption};P:${wifiData.password};H:${wifiData.hidden};;`
+      );
+      break;
+    // ... other cases
+  }
+}, [activeTab, wifiData]);
+```
+
+```jsx Form inputs
+<div className="grid-2-cols">
+  {/* SSID field */}
+  <div className="form-group">
+    <label className="form-label">Nombre de Red (SSID)</label>
+    <input 
+      type="text" 
+      value={wifiData.ssid} 
+      onChange={(e) => setWifiData({ ...wifiData, ssid: e.target.value })} 
+      placeholder="Mi Red WiFi" 
+    />
+  </div>
+  
+  {/* Password field */}
+  <div className="form-group">
+    <label className="form-label">Contraseña</label>
+    <input 
+      type="text" 
+      value={wifiData.password} 
+      onChange={(e) => setWifiData({ ...wifiData, password: e.target.value })} 
+      placeholder="********" 
+    />
+  </div>
+  
+  {/* Encryption type */}
+  <div className="form-group">
+    <label className="form-label">Seguridad</label>
+    <select 
+      value={wifiData.encryption} 
+      onChange={(e) => setWifiData({ ...wifiData, encryption: e.target.value })}
+    >
+      <option value="WPA">WPA/WPA2</option>
+      <option value="WEP">WEP</option>
+      <option value="nopass">Sin Contraseña</option>
+    </select>
+  </div>
+</div>
+```
+
+```jsx State update pattern
+// All updates use object spread to maintain other fields
+setWifiData({ ...wifiData, ssid: e.target.value })
+setWifiData({ ...wifiData, password: e.target.value })
+setWifiData({ ...wifiData, encryption: e.target.value })
+```
+</CodeGroup>
+
+The implementation constructs the standard WiFi QR format string using template literals, combining all four fields (SSID, encryption type, password, and hidden flag) into the proper format.
+
+<Info>
+The WiFi template is located at lines 116-135 in `src/components/QRGenerator.jsx`. The state is initialized at line 11 with default encryption set to 'WPA' and hidden set to false.
+</Info>
+
+## Security considerations
+
+<Card title="Password visibility" icon="eye">
+  The generated QR code contains your WiFi password in plain text format. Anyone who scans the code can see the password using a QR code reader app.
+</Card>
+
+<Card title="Guest networks recommended" icon="shield">
+  For security, create a separate guest network with limited access rather than sharing your main network credentials.
+</Card>
+
+<Card title="Rotate passwords periodically" icon="refresh">
+  Change your guest network password regularly and update the QR codes accordingly.
+</Card>

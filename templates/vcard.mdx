@@ -1,0 +1,295 @@
+---
+title: Contact card (vCard) QR codes
+description: Create QR codes that instantly add contact information to address books
+---
+
+The vCard template generates QR codes containing contact information that can be instantly added to a smartphone's address book. This is ideal for business cards, email signatures, event badges, and networking materials.
+
+## How to create a contact QR code
+
+1. Select the **Contacto** (Contact) tab in the generator
+2. Fill in the contact information fields:
+   - First name and last name
+   - Phone number
+   - Email address
+   - Company name (optional)
+3. Customize the QR code appearance
+4. Download and add to your business card or signature
+
+<Note>
+When scanned, the QR code will prompt users to save the contact directly to their phone's contacts app.
+</Note>
+
+## Contact information fields
+
+<ParamField path="vcardData.firstName" type="string">
+  The contact's first name (given name).
+</ParamField>
+
+<ParamField path="vcardData.lastName" type="string">
+  The contact's last name (family name).
+</ParamField>
+
+<ParamField path="vcardData.phone" type="string">
+  Phone number in international format is recommended (e.g., +1 234 567 8900).
+</ParamField>
+
+<ParamField path="vcardData.email" type="string">
+  Email address for the contact.
+</ParamField>
+
+<ParamField path="vcardData.company" type="string">
+  Organization or company name associated with the contact.
+</ParamField>
+
+## vCard format details
+
+The generator creates a vCard version 3.0 format string that's universally recognized by smartphones and contact management applications:
+
+```
+BEGIN:VCARD
+VERSION:3.0
+N:<lastName>;<firstName>;;;
+FN:<firstName> <lastName>
+ORG:<company>
+TEL;TYPE=CELL:<phone>
+EMAIL:<email>
+END:VCARD
+```
+
+### Format breakdown
+
+- **BEGIN:VCARD / END:VCARD** - Marks the start and end of the vCard data
+- **VERSION:3.0** - Specifies vCard format version (3.0 is widely supported)
+- **N:** - Structured name (Last;First;Middle;Prefix;Suffix)
+- **FN:** - Formatted name (full display name)
+- **ORG:** - Organization/company name
+- **TEL;TYPE=CELL** - Mobile phone number
+- **EMAIL:** - Email address
+
+### Example vCard
+
+<Tabs>
+  <Tab title="Complete contact">
+    ```
+    BEGIN:VCARD
+    VERSION:3.0
+    N:García;María;;;
+    FN:María García
+    ORG:Acme Corporation
+    TEL;TYPE=CELL:+34 612 345 678
+    EMAIL:maria.garcia@acme.com
+    END:VCARD
+    ```
+  </Tab>
+  
+  <Tab title="Minimal contact">
+    ```
+    BEGIN:VCARD
+    VERSION:3.0
+    N:Smith;John;;;
+    FN:John Smith
+    ORG:
+    TEL;TYPE=CELL:+1 555 123 4567
+    EMAIL:john@example.com
+    END:VCARD
+    ```
+  </Tab>
+  
+  <Tab title="Business contact">
+    ```
+    BEGIN:VCARD
+    VERSION:3.0
+    N:López;Carlos;;;
+    FN:Carlos López
+    ORG:Tech Solutions Inc.
+    TEL;TYPE=CELL:+52 1 55 1234 5678
+    EMAIL:c.lopez@techsolutions.mx
+    END:VCARD
+    ```
+  </Tab>
+</Tabs>
+
+## Use cases for business cards and contact sharing
+
+<Card title="Digital business cards" icon="id-card">
+  Add a vCard QR code to printed business cards so recipients can instantly save your contact information without manual typing.
+</Card>
+
+<Card title="Email signatures" icon="envelope">
+  Include a vCard QR code in your email signature for easy contact sharing in digital correspondence.
+</Card>
+
+<Card title="Event badges and name tags" icon="badge">
+  Print vCard QR codes on conference badges or event name tags to facilitate networking and contact exchange.
+</Card>
+
+<Card title="LinkedIn and social profiles" icon="users">
+  Add vCard QR codes to your LinkedIn profile image or social media bios for cross-platform contact sharing.
+</Card>
+
+<Card title="Marketing materials" icon="megaphone">
+  Include on flyers, brochures, or promotional materials to make it easy for potential customers to reach you.
+</Card>
+
+<Card title="Physical storefronts" icon="store">
+  Display at your business location so customers can quickly save your contact details for follow-up.
+</Card>
+
+## Best practices
+
+### Phone number formatting
+
+Use international format with country code for maximum compatibility:
+
+```
+✓ Good: +1 234 567 8900
+✓ Good: +44 20 7946 0958
+✓ Good: +81 3-1234-5678
+
+✗ Avoid: (234) 567-8900
+✗ Avoid: 555-1234
+```
+
+### Email validation
+
+Ensure email addresses are valid and professional:
+
+```
+✓ Good: contact@company.com
+✓ Good: firstname.lastname@domain.co.uk
+
+✗ Avoid: myemail@example
+✗ Avoid: user name@domain.com (spaces)
+```
+
+### Company names
+
+Include company names to provide professional context:
+
+```
+✓ Good: Tech Solutions Inc.
+✓ Good: María García Design Studio
+✓ Good: Lopez & Associates Law Firm
+```
+
+<Info>
+Leaving the company field empty is acceptable for personal contacts or freelancers without a formal business name.
+</Info>
+
+## Implementation example
+
+Here's how the vCard template generates contact QR codes:
+
+<CodeGroup>
+```jsx QRGenerator.jsx
+// vCard data state with all contact fields
+const [vcardData, setVcardData] = useState({ 
+  firstName: '', 
+  lastName: '', 
+  phone: '', 
+  email: '', 
+  company: '' 
+});
+
+// QR value generation using vCard 3.0 format
+useEffect(() => {
+  switch (activeTab) {
+    case 'vcard':
+      const vcard = `BEGIN:VCARD
+VERSION:3.0
+N:${vcardData.lastName};${vcardData.firstName};;;
+FN:${vcardData.firstName} ${vcardData.lastName}
+ORG:${vcardData.company}
+TEL;TYPE=CELL:${vcardData.phone}
+EMAIL:${vcardData.email}
+END:VCARD`;
+      setQrValue(vcard);
+      break;
+    // ... other cases
+  }
+}, [activeTab, vcardData]);
+```
+
+```jsx Form layout
+<div className="grid-2-cols">
+  {/* First name */}
+  <div className="form-group">
+    <label className="form-label">Nombre</label>
+    <input 
+      type="text" 
+      value={vcardData.firstName} 
+      onChange={(e) => setVcardData({ ...vcardData, firstName: e.target.value })} 
+      placeholder="Juan" 
+    />
+  </div>
+  
+  {/* Last name */}
+  <div className="form-group">
+    <label className="form-label">Apellido</label>
+    <input 
+      type="text" 
+      value={vcardData.lastName} 
+      onChange={(e) => setVcardData({ ...vcardData, lastName: e.target.value })} 
+      placeholder="Pérez" 
+    />
+  </div>
+  
+  {/* Phone */}
+  <div className="form-group">
+    <label className="form-label">Teléfono</label>
+    <input 
+      type="text" 
+      value={vcardData.phone} 
+      onChange={(e) => setVcardData({ ...vcardData, phone: e.target.value })} 
+      placeholder="+1 234 567 8900" 
+    />
+  </div>
+  
+  {/* Email */}
+  <div className="form-group">
+    <label className="form-label">Email</label>
+    <input 
+      type="text" 
+      value={vcardData.email} 
+      onChange={(e) => setVcardData({ ...vcardData, email: e.target.value })} 
+      placeholder="juan@ejemplo.com" 
+    />
+  </div>
+</div>
+```
+
+```jsx vCard string construction
+// Template literal constructs the vCard format
+const vcard = `BEGIN:VCARD
+VERSION:3.0
+N:${vcardData.lastName};${vcardData.firstName};;;
+FN:${vcardData.firstName} ${vcardData.lastName}
+ORG:${vcardData.company}
+TEL;TYPE=CELL:${vcardData.phone}
+EMAIL:${vcardData.email}
+END:VCARD`;
+
+setQrValue(vcard);
+```
+</CodeGroup>
+
+The implementation uses template literals to construct the vCard 3.0 format string, with newline characters (`\n`) separating each field. The form uses a two-column grid layout to organize the input fields efficiently.
+
+<Info>
+The vCard template is located at lines 137-156 in `src/components/QRGenerator.jsx`. The state is initialized at line 12 with all fields as empty strings. The vCard generation logic is at lines 34-36.
+</Info>
+
+## Compatibility
+
+The vCard 3.0 format is compatible with:
+
+- **iOS**: Native Camera app and Contacts
+- **Android**: Camera app, Google Contacts, and third-party QR readers
+- **Windows**: Default Camera app (Windows 10+)
+- **macOS**: Preview, Contacts
+- **Contact management apps**: Outlook, Gmail, Apple Mail, and most CRM systems
+
+<Note>
+vCard 3.0 is the most widely supported version. While vCard 4.0 exists, version 3.0 ensures maximum compatibility across all devices and platforms.
+</Note>

@@ -1,0 +1,347 @@
+---
+title: Advanced customization examples
+description: Master advanced QR code customization with colors, logos, high error correction, and SVG exports for professional applications
+---
+
+## Custom branded QR code with specific colors
+
+Create branded QR codes that match your company's visual identity using the color customization features.
+
+<CodeGroup>
+```jsx Color State
+const [fgColor, setFgColor] = useState('#0f172a');
+const [bgColor, setBgColor] = useState('#ffffff');
+
+// Users can customize through color pickers (line 180-190)
+<input 
+  type="color" 
+  value={fgColor} 
+  onChange={(e) => setFgColor(e.target.value)} 
+/>
+```
+
+```jsx Brand Example
+// Example: Tech startup brand
+fgColor: '#6366f1'  // Indigo brand color
+bgColor: '#fef3c7'  // Light amber background
+
+// Example: Eco-friendly brand
+fgColor: '#059669'  // Emerald green
+bgColor: '#ffffff'  // Clean white
+
+// Example: Luxury brand
+fgColor: '#1e1b4b'  // Deep indigo
+bgColor: '#faf5ff'  // Lavender tint
+```
+</CodeGroup>
+
+<Tip>
+The component displays the hex color value next to each picker for precise color matching (line 181, 188).
+</Tip>
+
+### Color application in QR generation
+
+Colors are applied directly to the `QRCodeSVG` component:
+
+```jsx
+<QRCodeSVG
+  value={qrValue}
+  size={size}
+  level={logoUrl ? 'H' : level}
+  bgColor={bgColor === 'transparent' ? '#ffffff' : bgColor}
+  fgColor={fgColor}
+  includeMargin={true}
+/>
+```
+
+<Note>
+The component automatically handles transparent backgrounds by falling back to white to ensure proper QR code rendering (line 234).
+</Note>
+
+## QR code with logo overlay
+
+Add a centered logo to your QR codes using the `imageSettings` prop. The component handles logo upload and proper QR code excavation.
+
+<Steps>
+  <Step title="Upload logo image">
+    The component uses FileReader API to handle image uploads (line 77-84):
+    
+    ```jsx
+    const [logoUrl, setLogoUrl] = useState('');
+    
+    const handleLogoUpload = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => setLogoUrl(event.target.result);
+        reader.readAsDataURL(file);
+      }
+    };
+    ```
+  </Step>
+  
+  <Step title="Configure image settings">
+    When a logo is present, the component automatically configures proper sizing and excavation (line 237-244):
+    
+    ```jsx
+    imageSettings={logoUrl ? {
+      src: logoUrl,
+      x: undefined,
+      y: undefined,
+      height: size * 0.22, // 22% of QR size
+      width: size * 0.22,
+      excavate: true, // Cuts away QR behind logo
+    } : undefined}
+    ```
+  </Step>
+  
+  <Step title="Force high error correction">
+    The component automatically sets error correction to level H when a logo is present:
+    
+    ```jsx
+    level={logoUrl ? 'H' : level}
+    ```
+    
+    This ensures the QR code remains scannable even with 30% covered by the logo.
+  </Step>
+</Steps>
+
+### Complete logo implementation
+
+```jsx
+// Upload button with hidden file input (line 197-201)
+<label className="btn btn-secondary upload-btn">
+  <ImageIcon size={16} /> Subir Imagen
+  <input 
+    type="file" 
+    accept="image/*" 
+    onChange={handleLogoUpload} 
+    style={{ display: 'none' }} 
+  />
+</label>
+
+// Remove logo button (line 201-205)
+{logoUrl && (
+  <button 
+    className="btn-icon" 
+    onClick={() => setLogoUrl('')} 
+    title="Quitar logo"
+  >
+    <Trash2 size={16} color="var(--error-color)" />
+  </button>
+)}
+```
+
+<Warning>
+Logo images should be square or nearly square for best results. The component sizes them to 22% of the QR code size (line 241-242).
+</Warning>
+
+## High error correction for damaged QR codes
+
+Understand and leverage the four error correction levels to create QR codes that work even when partially damaged.
+
+<Tabs>
+  <Tab title="Error correction levels">
+    The component offers four levels through a select dropdown (line 211-216):
+    
+    ```jsx
+    const [level, setLevel] = useState('H');
+    
+    <select value={level} onChange={(e) => setLevel(e.target.value)}>
+      <option value="L">Normal</option>      // ~7% damage tolerance
+      <option value="M">Buena</option>       // ~15% damage tolerance
+      <option value="Q">Alta</option>        // ~25% damage tolerance
+      <option value="H">Máxima (Logo)</option> // ~30% damage tolerance
+    </select>
+    ```
+  </Tab>
+  
+  <Tab title="When to use each level">
+    - **Level L (Normal)**: Simple URLs on clean surfaces
+    - **Level M (Buena)**: Standard business cards and flyers
+    - **Level Q (Alta)**: Outdoor signage or products with wear
+    - **Level H (Máxima)**: QR codes with logos or harsh environments
+  </Tab>
+  
+  <Tab title="Automatic level override">
+    The component forces level H when a logo is present:
+    
+    ```jsx
+    // In QRCodeSVG (line 233)
+    level={logoUrl ? 'H' : level}
+    
+    // In QRCodeCanvas (line 251)
+    level={logoUrl ? 'H' : level}
+    ```
+    
+    This ensures the QR code remains scannable with the logo overlay.
+  </Tab>
+</Tabs>
+
+## Complex vCard with all fields populated
+
+Create comprehensive contact cards with all available vCard 3.0 fields.
+
+```jsx
+// Full vCard state (line 12)
+const [vcardData, setVcardData] = useState({ 
+  firstName: '', 
+  lastName: '', 
+  phone: '', 
+  email: '', 
+  company: '' 
+});
+
+// vCard generation with all fields (line 35-36)
+const vcard = `BEGIN:VCARD
+VERSION:3.0
+N:${vcardData.lastName};${vcardData.firstName};;;
+FN:${vcardData.firstName} ${vcardData.lastName}
+ORG:${vcardData.company}
+TEL;TYPE=CELL:${vcardData.phone}
+EMAIL:${vcardData.email}
+END:VCARD`;
+```
+
+### Complete contact card example
+
+<CodeGroup>
+```jsx Input Data
+firstName: "María"
+lastName: "García"
+phone: "+34 612 345 678"
+email: "maria.garcia@techcorp.es"
+company: "TechCorp Solutions"
+```
+
+```text Generated vCard
+BEGIN:VCARD
+VERSION:3.0
+N:García;María;;;
+FN:María García
+ORG:TechCorp Solutions
+TEL;TYPE=CELL:+34 612 345 678
+EMAIL:maria.garcia@techcorp.es
+END:VCARD
+```
+</CodeGroup>
+
+<Note>
+The vCard format follows the VERSION 3.0 specification with proper field structure. The phone type is set to CELL for mobile compatibility.
+</Note>
+
+## SVG export for print materials
+
+Export QR codes as scalable vector graphics (SVG) for unlimited scaling without quality loss.
+
+<Steps>
+  <Step title="Component uses QRCodeSVG for display">
+    The visible QR code is rendered using `QRCodeSVG` from qrcode.react (line 230-245):
+    
+    ```jsx
+    <QRCodeSVG
+      value={qrValue}
+      size={size}
+      level={logoUrl ? 'H' : level}
+      bgColor={bgColor === 'transparent' ? '#ffffff' : bgColor}
+      fgColor={fgColor}
+      includeMargin={true}
+      imageSettings={logoUrl ? {
+        src: logoUrl,
+        height: size * 0.22,
+        width: size * 0.22,
+        excavate: true,
+      } : undefined}
+    />
+    ```
+  </Step>
+  
+  <Step title="SVG download handler serializes the element">
+    The download function extracts and serializes the SVG (line 60-75):
+    
+    ```jsx
+    const handleDownloadSVG = () => {
+      const svg = qrRef.current?.querySelector('svg');
+      if (!svg) return;
+
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([svgData], { 
+        type: "image/svg+xml;charset=utf-8" 
+      });
+      const url = URL.createObjectURL(blob);
+
+      let downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = "qr-premium-vector.svg";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(url);
+    };
+    ```
+  </Step>
+  
+  <Step title="Click the SVG button">
+    ```jsx
+    <button 
+      className="btn btn-secondary" 
+      onClick={handleDownloadSVG} 
+      title="Vectores infinitamente escalables"
+    >
+      SVG (Vector)
+    </button>
+    ```
+    
+    The file is saved as `qr-premium-vector.svg` with all styling preserved.
+  </Step>
+</Steps>
+
+<Tip>
+SVG exports are perfect for print materials because they scale to any size without pixelation. Use SVG for banners, billboards, and professional print jobs.
+</Tip>
+
+## Multiple format exports workflow
+
+Implement a workflow that exports QR codes in both PNG and SVG formats for different use cases.
+
+```jsx
+// Both export functions are available in the component
+const handleDownloadPNG = () => { /* PNG export logic */ };
+const handleDownloadSVG = () => { /* SVG export logic */ };
+
+// UI provides both options (line 262-270)
+<div className="download-section">
+  <div className="download-group">
+    <button className="btn btn-primary" onClick={handleDownloadPNG}>
+      <Download size={18} /> PNG
+    </button>
+    <button 
+      className="btn btn-secondary" 
+      onClick={handleDownloadSVG} 
+      title="Vectores infinitamente escalables"
+    >
+      SVG (Vector)
+    </button>
+  </div>
+</div>
+```
+
+### Recommended workflow
+
+<Card title="PNG for digital, SVG for print" icon="download">
+  1. **PNG exports** at 560x560px (2x resolution) are ideal for:
+     - Website integration
+     - Social media posts
+     - Digital documents and presentations
+     - Mobile app assets
+  
+  2. **SVG exports** are ideal for:
+     - Print materials (business cards, flyers, posters)
+     - Large format printing (banners, billboards)
+     - Professional branding materials
+     - Situations requiring infinite scaling
+</Card>
+
+<Note>
+The component renders both a visible SVG (for display and SVG export) and a hidden high-resolution canvas (for PNG export) to provide optimal quality for each format.
+</Note>

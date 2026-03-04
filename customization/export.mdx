@@ -1,0 +1,277 @@
+---
+title: Export options
+description: Export your customized QR codes as high-resolution PNG images or infinitely scalable SVG vectors for any use case
+---
+
+Generador QR Pro provides two export formats optimized for different use cases: PNG for immediate use and SVG for professional design workflows.
+
+## Export formats overview
+
+<CardGroup cols={2}>
+  <Card title="PNG Export" icon="image">
+    High-resolution raster format  
+    **Resolution:** 560px × 560px (2× base size)  
+    **Filename:** qr-premium.png  
+    **Best for:** Direct use, social media, printing
+  </Card>
+  <Card title="SVG Export" icon="vector-square">
+    Vector format, infinitely scalable  
+    **Resolution:** Resolution-independent  
+    **Filename:** qr-premium-vector.svg  
+    **Best for:** Professional design, large prints
+  </Card>
+</CardGroup>
+
+## PNG export functionality
+
+The PNG export creates a high-resolution raster image from a canvas element:
+
+```jsx
+const handleDownloadPNG = () => {
+  const canvas = qrRef.current?.querySelector('canvas');
+  if (!canvas) return;
+
+  const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+  let downloadLink = document.createElement("a");
+  downloadLink.href = pngUrl;
+  downloadLink.download = "qr-premium.png";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+};
+```
+
+<Steps>
+  <Step title="Find canvas element">
+    Locates the hidden canvas element in the QR preview container
+  </Step>
+  <Step title="Generate data URL">
+    Converts the canvas content to a PNG data URL using `toDataURL()`
+  </Step>
+  <Step title="Create download link">
+    Creates a temporary anchor element with the data URL
+  </Step>
+  <Step title="Trigger download">
+    Programmatically clicks the link to start the download, then cleans up
+  </Step>
+</Steps>
+
+### High-resolution rendering
+
+The PNG export uses a hidden canvas with double the display resolution:
+
+```jsx
+<div style={{ display: 'none' }}>
+  <QRCodeCanvas
+    value={qrValue}
+    size={size * 2} // 560px for 280px base size
+    level={logoUrl ? 'H' : level}
+    bgColor={bgColor}
+    fgColor={fgColor}
+    includeMargin={true}
+    imageSettings={logoUrl ? {
+      src: logoUrl, 
+      height: (size * 2) * 0.22, 
+      width: (size * 2) * 0.22, 
+      excavate: true,
+    } : undefined}
+  />
+</div>
+```
+
+<Note>
+  The 2× resolution (560px) ensures crisp, high-quality output suitable for printing at typical sizes (business cards, flyers, posters).
+</Note>
+
+### PNG characteristics
+
+<Accordion title="Raster format">
+  PNG is a bitmap/raster format that stores image data as a grid of pixels. Each pixel has a defined color value.
+</Accordion>
+
+<Accordion title="Lossless compression">
+  PNG uses lossless compression, meaning no quality is lost during compression. The image remains pixel-perfect.
+</Accordion>
+
+<Accordion title="Fixed resolution">
+  The 560px × 560px size is fixed. Scaling beyond this size will reduce quality, while scaling down maintains quality.
+</Accordion>
+
+<Accordion title="Color support">
+  PNG supports the full RGB color space and alpha transparency, preserving your custom colors exactly.
+</Accordion>
+
+## SVG export functionality
+
+The SVG export serializes the vector graphic and creates a downloadable blob:
+
+```jsx
+const handleDownloadSVG = () => {
+  const svg = qrRef.current?.querySelector('svg');
+  if (!svg) return;
+
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  let downloadLink = document.createElement("a");
+  downloadLink.href = url;
+  downloadLink.download = "qr-premium-vector.svg";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  URL.revokeObjectURL(url);
+};
+```
+
+<Steps>
+  <Step title="Find SVG element">
+    Locates the visible SVG element in the QR preview
+  </Step>
+  <Step title="Serialize to XML">
+    Converts the SVG DOM to an XML string using XMLSerializer
+  </Step>
+  <Step title="Create blob">
+    Creates a Blob with the SVG data and proper MIME type
+  </Step>
+  <Step title="Generate object URL">
+    Creates a temporary URL for the blob
+  </Step>
+  <Step title="Download and cleanup">
+    Triggers download, then revokes the object URL to free memory
+  </Step>
+</Steps>
+
+### SVG characteristics
+
+<Accordion title="Vector format">
+  SVG is a vector format that stores images as mathematical paths and shapes rather than pixels. This makes them infinitely scalable.
+</Accordion>
+
+<Accordion title="Resolution independent">
+  SVG files can be scaled to any size without quality loss - perfect for everything from business cards to billboards.
+</Accordion>
+
+<Accordion title="Editable">
+  SVG files can be opened and edited in design software like Adobe Illustrator, Figma, or Inkscape.
+</Accordion>
+
+<Accordion title="Small file size">
+  SVG files are typically smaller than equivalent high-resolution PNGs because they store mathematical descriptions rather than pixel data.
+</Accordion>
+
+<Warning>
+  SVG files with embedded logos (raster images) will still contain the logo as a raster image element. The QR code pattern itself remains vector.
+</Warning>
+
+## Download interface
+
+Both export options are presented in a clean download section:
+
+```jsx
+<div className="download-section">
+  <div className="download-group">
+    <button className="btn btn-primary" onClick={handleDownloadPNG}>
+      <Download size={18} /> PNG
+    </button>
+    <button className="btn btn-secondary" onClick={handleDownloadSVG} title="Vectores infinitamente escalables">
+      SVG (Vector)
+    </button>
+  </div>
+</div>
+```
+
+<Tip>
+  The SVG button includes a tooltip ("Vectores infinitamente escalables") to help users understand the benefit of vector format.
+</Tip>
+
+## File naming convention
+
+Exported files use consistent, descriptive names:
+
+- **PNG files:** `qr-premium.png`
+- **SVG files:** `qr-premium-vector.svg`
+
+The "premium" prefix distinguishes these from basic QR code generators, and the "vector" suffix clearly identifies the SVG format.
+
+<Note>
+  Files are downloaded with these exact names. Browsers will automatically add numbers (e.g., qr-premium (1).png) if you download multiple files without renaming them.
+</Note>
+
+## Use cases for each format
+
+Choose the right format for your specific needs:
+
+### When to use PNG
+
+<CardGroup cols={2}>
+  <Card title="Social media" icon="share-nodes">
+    PNG works universally across all social platforms and appears correctly in previews
+  </Card>
+  <Card title="Website embedding" icon="globe">
+    Smaller file size than high-res vectors, faster page load times
+  </Card>
+  <Card title="Email marketing" icon="envelope">
+    Guaranteed to display correctly in all email clients
+  </Card>
+  <Card title="Quick printing" icon="print">
+    Ready to print at business card or flyer sizes without additional processing
+  </Card>
+</CardGroup>
+
+### When to use SVG
+
+<CardGroup cols={2}>
+  <Card title="Professional design" icon="pen-nib">
+    Import into Adobe Illustrator, Figma, or other design tools for further editing
+  </Card>
+  <Card title="Large format printing" icon="panorama">
+    Posters, banners, billboards - scale to any size without quality loss
+  </Card>
+  <Card title="Responsive web design" icon="mobile-screen">
+    Looks sharp on all display densities (retina displays, 4K screens, etc.)
+  </Card>
+  <Card title="Brand asset libraries" icon="folder-open">
+    Store as master files that can be exported at any resolution later
+  </Card>
+</CardGroup>
+
+<Tip>
+  When in doubt, download both formats. PNG for immediate use and SVG for future flexibility.
+</Tip>
+
+## Customizations included in exports
+
+Both export formats preserve all your customizations:
+
+- **Colors:** Custom foreground and background colors
+- **Logo:** Embedded logo with correct sizing and excavation
+- **Quality:** Error correction level (automatically 'H' with logos)
+- **Margins:** Proper quiet zone for reliable scanning
+- **Data:** URL, WiFi credentials, vCard, or email data
+
+<Warning>
+  Always test exported QR codes with a real scanner before mass production or distribution to ensure they work in your intended environment.
+</Warning>
+
+## Technical considerations
+
+### PNG export details
+
+- **Format:** PNG-8 or PNG-24 depending on color complexity
+- **Color space:** RGB with optional alpha channel
+- **Compression:** Automatic lossless compression
+- **Resolution:** 560 × 560 pixels (2× display size)
+- **DPI:** Screen resolution (72 DPI) - rescale in design software for print
+
+### SVG export details
+
+- **Standard:** SVG 1.1
+- **Encoding:** UTF-8 XML
+- **Namespace:** Includes proper XML namespaces for compatibility
+- **Embedded images:** Logos are embedded as base64 data URLs
+- **Compatibility:** Works in all modern browsers and design software
+
+<Note>
+  For print production, designers typically convert PNG exports to CMYK color space or work with SVG exports that can be processed with proper color management.
+</Note>

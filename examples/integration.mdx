@@ -1,0 +1,432 @@
+---
+title: Integration examples
+description: Learn how to integrate Generador QR Pro into your React applications, customize the component, and deploy production builds
+---
+
+## How to integrate QRGenerator into a React app
+
+The QRGenerator component is built as a standalone React component that can be easily integrated into any React application.
+
+### Project structure
+
+```text
+generador_qr/
+├── src/
+│   ├── components/
+│   │   └── QRGenerator.jsx    // Main component
+│   ├── App.jsx                // App wrapper
+│   ├── main.jsx              // Entry point
+│   └── index.css             // Styles
+├── vite.config.js            // Vite configuration
+└── package.json              // Dependencies
+```
+
+### Required dependencies
+
+<CodeGroup>
+```json package.json
+{
+  "dependencies": {
+    "lucide-react": "^0.576.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}
+```
+
+```bash Install command
+npm install lucide-react qrcode.react react react-dom
+```
+</CodeGroup>
+
+<Note>
+**lucide-react** provides the icons (Download, QrCode, Settings2, etc.) and **qrcode.react** provides both QRCodeCanvas and QRCodeSVG components for QR generation.
+</Note>
+
+## Importing and using the component
+
+<Steps>
+  <Step title="Import the QRGenerator component">
+    The component is imported as a default export from the components directory (App.jsx:2):
+    
+    ```jsx
+    import React from 'react';
+    import QRGenerator from './components/QRGenerator';
+    ```
+  </Step>
+  
+  <Step title="Add it to your App component">
+    The basic integration shown in App.jsx (line 4-17):
+    
+    ```jsx
+    function App() {
+      return (
+        <div className="container animate-fade-in">
+          <header className="header">
+            <h1 className="title">Generador QR Pro</h1>
+            <p className="subtitle">
+              Crea, personaliza y descarga códigos QR con un diseño 
+              premium al instante.
+            </p>
+          </header>
+          
+          <main>
+            <QRGenerator />
+          </main>
+        </div>
+      );
+    }
+    
+    export default App;
+    ```
+  </Step>
+  
+  <Step title="Render the App">
+    The entry point uses React 19's createRoot API (main.jsx:6-10):
+    
+    ```jsx
+    import { StrictMode } from 'react'
+    import { createRoot } from 'react-dom/client'
+    import './index.css'
+    import App from './App.jsx'
+    
+    createRoot(document.getElementById('root')).render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    )
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+The component is self-contained and manages all its own state, so you can drop it into any React application without additional configuration.
+</Tip>
+
+## Customizing the component for specific use cases
+
+You can customize the QRGenerator component by modifying initial state values or removing features you don't need.
+
+### Example: URL-only QR generator
+
+<CodeGroup>
+```jsx Remove unnecessary tabs
+// In QRGenerator.jsx, simplify to only URL tab
+export default function QRGenerator() {
+  // Remove activeTab state since we only have URL
+  const [urlData, setUrlData] = useState('https://example.com');
+  
+  // Remove wifiData, vcardData, emailData states
+  
+  // Simplify qrValue to only use urlData
+  const [qrValue, setQrValue] = useState(urlData);
+  
+  useEffect(() => {
+    setQrValue(urlData || 'https://');
+  }, [urlData]);
+  
+  // Remove tab navigation UI (line 92-105)
+  // Keep only the URL input form (line 109-114)
+}
+```
+
+```jsx Preset colors for brand
+// Set brand colors as defaults
+const [fgColor, setFgColor] = useState('#6366f1'); // Brand indigo
+const [bgColor, setBgColor] = useState('#ffffff');
+
+// Or remove color pickers entirely and use fixed colors
+<QRCodeSVG
+  value={qrValue}
+  size={size}
+  level={level}
+  bgColor="#ffffff"
+  fgColor="#6366f1" // Fixed brand color
+  includeMargin={true}
+/>
+```
+</CodeGroup>
+
+### Example: WiFi QR code generator only
+
+```jsx
+export default function WiFiQRGenerator() {
+  const [wifiData, setWifiData] = useState({ 
+    ssid: '', 
+    password: '', 
+    encryption: 'WPA', 
+    hidden: false 
+  });
+  
+  const [qrValue, setQrValue] = useState('');
+  
+  useEffect(() => {
+    setQrValue(
+      `WIFI:S:${wifiData.ssid};T:${wifiData.encryption};P:${wifiData.password};H:${wifiData.hidden};;`
+    );
+  }, [wifiData]);
+  
+  // Keep only WiFi form fields (line 116-134)
+  // Remove other tabs and forms
+  // Simplify UI to focus on WiFi credentials
+}
+```
+
+<Warning>
+If you customize the component, make sure to test QR code generation thoroughly. The format strings (especially for WiFi and vCard) must be exact for proper scanning.
+</Warning>
+
+## Building and deploying the application
+
+Generador QR Pro uses Vite for fast development and optimized production builds.
+
+<Tabs>
+  <Tab title="Development">
+    Start the development server with hot module replacement:
+    
+    ```bash
+    npm run dev
+    ```
+    
+    This runs `vite` command from package.json:7 and starts the dev server on http://localhost:5173
+  </Tab>
+  
+  <Tab title="Production build">
+    Create an optimized production build:
+    
+    ```bash
+    npm run build
+    ```
+    
+    This runs `vite build` command from package.json:8 and outputs to `dist/` directory.
+  </Tab>
+  
+  <Tab title="Preview build">
+    Preview the production build locally:
+    
+    ```bash
+    npm run preview
+    ```
+    
+    This runs `vite preview` command from package.json:10 and serves the `dist/` directory.
+  </Tab>
+</Tabs>
+
+### Build output
+
+The production build creates optimized assets:
+
+```text
+dist/
+├── index.html              // Entry HTML
+├── assets/
+│   ├── index-[hash].js    // Bundled JavaScript
+│   ├── index-[hash].css   // Bundled styles
+│   └── [other assets]     // Images, fonts, etc.
+```
+
+<Note>
+Vite automatically handles code splitting, tree shaking, and minification for optimal performance.
+</Note>
+
+## Vite configuration details
+
+The project uses a minimal Vite configuration optimized for React.
+
+```js vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+```
+
+### Key configuration features
+
+<Card title="Vite + React setup" icon="settings">
+  - **@vitejs/plugin-react**: Enables React Fast Refresh and JSX transformation
+  - **Default port**: 5173 for development
+  - **Hot Module Replacement (HMR)**: Instant updates without full page reload
+  - **ES modules**: Native ESM imports for faster dev server
+  - **Automatic code splitting**: Optimizes bundle size in production
+</Card>
+
+### Advanced configuration options
+
+You can extend the Vite config for custom needs:
+
+<CodeGroup>
+```js Custom base path
+export default defineConfig({
+  plugins: [react()],
+  base: '/qr-generator/', // For subdirectory deployment
+})
+```
+
+```js Custom build output
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    outDir: 'build', // Change from 'dist' to 'build'
+    sourcemap: true, // Generate source maps
+  },
+})
+```
+
+```js Custom dev server
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3000, // Change default port
+    open: true, // Auto-open browser
+  },
+})
+```
+</CodeGroup>
+
+## Production build optimization
+
+Vite automatically applies several optimizations to production builds.
+
+<Steps>
+  <Step title="Code minification">
+    JavaScript and CSS are automatically minified using esbuild (faster than Terser):
+    
+    - Removes whitespace and comments
+    - Shortens variable names
+    - Removes dead code
+  </Step>
+  
+  <Step title="Asset optimization">
+    - Images and fonts are hashed for cache busting
+    - Small images are inlined as base64
+    - CSS is extracted into separate files
+  </Step>
+  
+  <Step title="Tree shaking">
+    Unused code is automatically removed:
+    
+    ```jsx
+    // Only imported icons are included in bundle
+    import { Download, QrCode, Settings2, Link, Wifi, User, Mail, Image, Trash2 } from 'lucide-react';
+    ```
+    
+    lucide-react's tree-shakeable structure ensures only these 9 icons are bundled, not the entire icon library.
+  </Step>
+</Steps>
+
+<Tip>
+The production build is typically 70-80% smaller than the development bundle due to these optimizations.
+</Tip>
+
+## Embedding in existing React projects
+
+Integrate the QRGenerator into an existing React application with different routing setups.
+
+### With React Router
+
+```jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import QRGenerator from './components/QRGenerator';
+import Home from './pages/Home';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/qr-generator" element={<QRGenerator />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+### As a modal or drawer
+
+```jsx
+import { useState } from 'react';
+import QRGenerator from './components/QRGenerator';
+import Modal from './components/Modal';
+
+function Dashboard() {
+  const [showQRGenerator, setShowQRGenerator] = useState(false);
+  
+  return (
+    <div>
+      <button onClick={() => setShowQRGenerator(true)}>
+        Generate QR Code
+      </button>
+      
+      <Modal 
+        isOpen={showQRGenerator} 
+        onClose={() => setShowQRGenerator(false)}
+      >
+        <QRGenerator />
+      </Modal>
+    </div>
+  );
+}
+```
+
+### With Next.js
+
+<CodeGroup>
+```jsx App Router (Next.js 13+)
+// app/qr-generator/page.jsx
+'use client'; // Required for useState/useEffect
+
+import QRGenerator from '@/components/QRGenerator';
+
+export default function QRGeneratorPage() {
+  return (
+    <main>
+      <QRGenerator />
+    </main>
+  );
+}
+```
+
+```jsx Pages Router (Next.js 12)
+// pages/qr-generator.jsx
+import QRGenerator from '../components/QRGenerator';
+
+export default function QRGeneratorPage() {
+  return <QRGenerator />;
+}
+```
+</CodeGroup>
+
+<Warning>
+When using Next.js App Router, add `'use client'` directive since QRGenerator uses client-side hooks (useState, useEffect, useRef).
+</Warning>
+
+### Component props extension
+
+You can extend the component to accept props for controlled usage:
+
+```jsx
+export default function QRGenerator({ 
+  initialUrl = 'https://example.com',
+  initialColors = { fg: '#0f172a', bg: '#ffffff' },
+  onGenerate = null 
+}) {
+  const [urlData, setUrlData] = useState(initialUrl);
+  const [fgColor, setFgColor] = useState(initialColors.fg);
+  const [bgColor, setBgColor] = useState(initialColors.bg);
+  
+  // Call onGenerate callback when QR is generated
+  useEffect(() => {
+    if (onGenerate && qrValue) {
+      onGenerate(qrValue);
+    }
+  }, [qrValue, onGenerate]);
+  
+  // Rest of component...
+}
+```
+
+This allows parent components to control initial values and react to QR code generation.

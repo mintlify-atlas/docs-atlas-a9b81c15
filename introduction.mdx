@@ -1,0 +1,102 @@
+---
+title: Introduction
+description: Learn about Generador QR Pro - a modern QR code generator with premium templates and customization options
+---
+
+# Introduction
+
+Generador QR Pro is a modern, feature-rich QR code generator built with React 19 and Vite. It provides an intuitive interface for creating, customizing, and exporting professional-quality QR codes with multiple templates and advanced customization options.
+
+## What is Generador QR Pro?
+
+Generador QR Pro is a web-based application that allows users to generate QR codes for various use cases including URLs, WiFi credentials, contact information (vCards), and email links. The application features a clean, glassmorphic UI with real-time preview and high-quality export options.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Multiple templates" icon="grid-2-plus">
+    Generate QR codes for URLs, WiFi networks, contact cards (vCard), and email links with dedicated input forms for each type.
+  </Card>
+  
+  <Card title="Advanced customization" icon="palette">
+    Customize foreground and background colors, adjust QR code size, control error correction levels, and add custom logos to the center of your QR codes.
+  </Card>
+  
+  <Card title="High-quality exports" icon="download">
+    Export your QR codes as PNG images (high resolution, 2x scaling) or SVG vectors for infinite scalability without quality loss.
+  </Card>
+  
+  <Card title="Real-time preview" icon="eye">
+    See your QR code update in real-time as you modify data and customize appearance with live visual feedback.
+  </Card>
+</CardGroup>
+
+## Use cases and benefits
+
+### Business applications
+- Create branded QR codes with your company logo
+- Generate WiFi access codes for guests and customers
+- Share contact information via scannable vCards
+- Create promotional links with custom styling
+
+### Personal use
+- Share website URLs and social media profiles
+- Generate WiFi credentials for home networks
+- Create email contact links with pre-filled subject lines
+- Design custom QR codes for events and invitations
+
+### Benefits
+- **No server required**: All QR generation happens in the browser for privacy and speed
+- **Professional quality**: High error correction (up to Level H) ensures scannability even with logos
+- **Export flexibility**: Choose between raster (PNG) and vector (SVG) formats based on your needs
+- **Easy customization**: Intuitive color pickers and controls for complete design control
+
+## Technology stack
+
+Generador QR Pro is built with modern web technologies:
+
+- **React 19.2.0**: Latest React version with improved performance and new features
+- **Vite 7.3.1**: Lightning-fast build tool with hot module replacement (HMR)
+- **qrcode.react 4.2.0**: Robust QR code generation library with Canvas and SVG support
+- **Lucide React 0.576.0**: Beautiful, consistent icon library
+- **ESLint**: Code quality and consistency enforcement
+
+<Info>
+  The application uses both `QRCodeCanvas` and `QRCodeSVG` components from qrcode.react - SVG for display and vector export, Canvas for high-resolution PNG export.
+</Info>
+
+## QR code templates
+
+Generador QR Pro supports four different QR code types:
+
+| Template | Icon | Use Case | Data Format |
+|----------|------|----------|-------------|
+| **URL** | Link | Websites, social media, links | Plain URL string |
+| **WiFi** | Wifi | Network credentials | WIFI:S:ssid;T:encryption;P:password;H:hidden;; |
+| **Contact (vCard)** | User | Business cards, contacts | vCard 3.0 format with name, phone, email |
+| **Email** | Mail | Pre-filled email links | mailto: URL with subject and body |
+
+## Error correction levels
+
+The application supports four QR code error correction levels:
+
+- **L (Normal)**: ~7% error correction capability
+- **M (Buena)**: ~15% error correction capability  
+- **Q (Alta)**: ~25% error correction capability
+- **H (Máxima)**: ~30% error correction capability - automatically used when logos are added
+
+<Tip>
+  When adding a logo to your QR code, the application automatically uses Level H error correction to ensure the code remains scannable even with 22% of the center covered by your image.
+</Tip>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get up and running in minutes with our quick start guide
+  </Card>
+  
+  <Card title="Installation" icon="download" href="/installation">
+    Detailed installation instructions and project structure overview
+  </Card>
+</CardGroup>

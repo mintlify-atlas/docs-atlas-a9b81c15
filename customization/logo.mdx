@@ -1,0 +1,215 @@
+---
+title: Logo integration
+description: Add custom logos to your QR codes with automatic positioning, size optimization, and pattern excavation for reliable scanning
+---
+
+Generador QR Pro allows you to embed a logo in the center of your QR codes, creating branded QR codes that remain fully scannable.
+
+## Logo upload functionality
+
+The application provides a simple file upload interface for adding logos:
+
+```jsx
+const [logoUrl, setLogoUrl] = useState('');
+
+const handleLogoUpload = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (event) => setLogoUrl(event.target.result);
+    reader.readAsDataURL(file);
+  }
+};
+```
+
+<Steps>
+  <Step title="Click upload button">
+    Select the "Subir Imagen" (Upload Image) button in the Logo Central section
+  </Step>
+  <Step title="Choose image file">
+    Browse and select an image file from your device
+  </Step>
+  <Step title="Automatic processing">
+    The image is read as a Data URL and immediately embedded in the QR code
+  </Step>
+  <Step title="Preview and export">
+    Your logo appears centered in the QR code preview and will be included in all exports
+  </Step>
+</Steps>
+
+## Upload interface
+
+The logo upload section includes both upload and remove functionality:
+
+```jsx
+<div className="form-group">
+  <label className="form-label">Logo Central</label>
+  <div className="file-upload-wrapper">
+    <label className="btn btn-secondary upload-btn">
+      <ImageIcon size={16} /> Subir Imagen
+      <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} />
+    </label>
+    {logoUrl && (
+      <button className="btn-icon" onClick={() => setLogoUrl('')} title="Quitar logo">
+        <Trash2 size={16} color="var(--error-color)" />
+      </button>
+    )}
+  </div>
+</div>
+```
+
+<Note>
+  The remove button (trash icon) only appears when a logo is currently loaded, providing a clean interface.
+</Note>
+
+## Logo size and positioning
+
+Logos are automatically sized and centered within the QR code:
+
+```jsx
+imageSettings={logoUrl ? {
+  src: logoUrl,
+  x: undefined,
+  y: undefined,
+  height: size * 0.22, // 22% of QR code size
+  width: size * 0.22,
+  excavate: true,
+} : undefined}
+```
+
+<CardGroup cols={2}>
+  <Card title="Logo dimensions">
+    **Size:** 22% of the total QR code size  
+    **Width and height:** Equal (square aspect ratio)  
+    **For 280px QR:** Logo is approximately 62px × 62px
+  </Card>
+  <Card title="Positioning">
+    **Horizontal:** Centered (x: undefined)  
+    **Vertical:** Centered (y: undefined)  
+    **Automatic:** No manual positioning needed
+  </Card>
+</CardGroup>
+
+## Excavate feature
+
+The `excavate: true` setting is critical for logo integration:
+
+<Accordion title="What excavate does">
+  The excavate feature removes the QR code pattern behind the logo, creating a clean space. This prevents the QR pattern from showing through or interfering with the logo image.
+</Accordion>
+
+<Accordion title="Why it's important">
+  Without excavation, the QR code modules would overlap with the logo, creating visual noise and potentially affecting scannability. Excavation ensures a professional appearance.
+</Accordion>
+
+<Accordion title="Technical implementation">
+  The qrcode.react library handles excavation automatically when `excavate: true` is set, calculating which modules to remove based on the logo position and size.
+</Accordion>
+
+<Warning>
+  Excavating the QR pattern removes data-bearing modules. This is why error correction level 'H' is required when using logos.
+</Warning>
+
+## Error correction level enforcement
+
+When a logo is present, the error correction level is automatically set to 'H' (maximum):
+
+```jsx
+<QRCodeSVG
+  value={qrValue}
+  size={size}
+  level={logoUrl ? 'H' : level} // Force H if logo present
+  // ...
+/>
+```
+
+### Why level 'H' is required
+
+<Steps>
+  <Step title="Data redundancy">
+    Error correction level 'H' provides 30% redundancy, allowing up to 30% of the QR code to be damaged or obscured
+  </Step>
+  <Step title="Logo coverage">
+    The 22% logo size fits within the 30% tolerance, ensuring the QR code remains scannable
+  </Step>
+  <Step title="Automatic enforcement">
+    The application automatically switches to level 'H' when you add a logo, regardless of your quality setting
+  </Step>
+  <Step title="Safety margin">
+    The 8% buffer (30% tolerance - 22% logo) provides extra resilience for scanning errors
+  </Step>
+</Steps>
+
+<Tip>
+  Even though the quality selector shows your chosen level, the actual generated QR code uses level 'H' when a logo is present. This is shown in the quality selector label: "Máxima (Logo)".
+</Tip>
+
+## Supported image formats
+
+The file input accepts all image formats:
+
+```jsx
+<input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} />
+```
+
+Common supported formats include:
+
+- **PNG** - Best for logos with transparency
+- **JPEG/JPG** - Good for photographic logos
+- **SVG** - Vector logos (converted to raster in QR code)
+- **GIF** - Supported, but static frame only
+- **WebP** - Modern format with good compression
+
+<Note>
+  Logos with transparent backgrounds work best, allowing the QR code background color to show through.
+</Note>
+
+## High-resolution export
+
+Logos are included in both PNG and SVG exports:
+
+### PNG export (2× resolution)
+
+```jsx
+<QRCodeCanvas
+  value={qrValue}
+  size={size * 2} // High resolution for PNG
+  level={logoUrl ? 'H' : level}
+  bgColor={bgColor}
+  fgColor={fgColor}
+  includeMargin={true}
+  imageSettings={logoUrl ? {
+    src: logoUrl, 
+    height: (size * 2) * 0.22, 
+    width: (size * 2) * 0.22, 
+    excavate: true,
+  } : undefined}
+/>
+```
+
+The logo is scaled proportionally for the high-resolution canvas (560px QR code results in ~123px logo).
+
+### SVG export (vector format)
+
+The SVG export embeds the logo as an image element within the vector graphic, maintaining the 22% size ratio.
+
+## Logo best practices
+
+<CardGroup cols={2}>
+  <Card title="Simple designs" icon="sparkles">
+    Use logos with clear, simple designs that remain recognizable at small sizes
+  </Card>
+  <Card title="High contrast" icon="circle-half-stroke">
+    Ensure your logo has good contrast with the QR code background
+  </Card>
+  <Card title="Square aspect ratio" icon="square">
+    Square or nearly-square logos work best in the circular center space
+  </Card>
+  <Card title="Test scanning" icon="mobile">
+    Always test QR codes with logos on multiple devices before production use
+  </Card>
+</CardGroup>
+
+<Warning>
+  Overly complex or detailed logos may not display well at the 22% size. Consider using a simplified version of your logo for QR codes.
+</Warning>

@@ -1,0 +1,264 @@
+---
+title: Quality settings
+description: Configure error correction levels, size, and margins to optimize QR code scannability and appearance for different use cases
+---
+
+Generador QR Pro provides comprehensive quality settings to ensure your QR codes work perfectly in any situation, from business cards to billboards.
+
+## Error correction levels
+
+QR codes use Reed-Solomon error correction to remain scannable even when partially damaged or obscured. The application offers four levels:
+
+```jsx
+const [level, setLevel] = useState('H');
+```
+
+<CardGroup cols={2}>
+  <Card title="L - Normal" icon="1">
+    **Recovery:** ~7% of data  
+    **Use case:** Clean, controlled environments  
+    **Density:** Maximum data capacity
+  </Card>
+  <Card title="M - Good" icon="2">
+    **Recovery:** ~15% of data  
+    **Use case:** General purpose applications  
+    **Density:** Balanced capacity and resilience
+  </Card>
+  <Card title="Q - High" icon="3">
+    **Recovery:** ~25% of data  
+    **Use case:** Outdoor use or rough surfaces  
+    **Density:** Lower capacity, higher reliability
+  </Card>
+  <Card title="H - Maximum" icon="4">
+    **Recovery:** ~30% of data  
+    **Use case:** Logos, damaged surfaces  
+    **Density:** Lowest capacity, maximum resilience
+  </Card>
+</CardGroup>
+
+## Quality selector interface
+
+The quality dropdown provides clear labels for each level:
+
+```jsx
+<div className="form-group">
+  <label className="form-label">Calidad</label>
+  <select value={level} onChange={(e) => setLevel(e.target.value)}>
+    <option value="L">Normal</option>
+    <option value="M">Buena</option>
+    <option value="Q">Alta</option>
+    <option value="H">Máxima (Logo)</option>
+  </select>
+</div>
+```
+
+<Note>
+  The "Máxima (Logo)" label indicates that level 'H' is required when using logos. The application automatically enforces this.
+</Note>
+
+## How error correction affects scannability
+
+Error correction creates redundancy in the QR code data:
+
+<Steps>
+  <Step title="Data encoding">
+    Your content is encoded into the QR code pattern
+  </Step>
+  <Step title="Redundant data added">
+    Additional error correction codewords are calculated and added
+  </Step>
+  <Step title="Module allocation">
+    Higher error correction requires more modules (black/white squares)
+  </Step>
+  <Step title="Damage tolerance">
+    Scanners can reconstruct damaged or missing data using the redundant information
+  </Step>
+</Steps>
+
+### Practical implications
+
+<Accordion title="More correction = More modules">
+  Higher error correction levels require more space in the QR code. This means either:
+  - More dense patterns for the same size QR code
+  - Larger QR codes for the same data density
+</Accordion>
+
+<Accordion title="Data capacity trade-off">
+  As error correction increases, the amount of user data that fits in a QR code decreases:
+  - Level L: Maximum ~2,953 alphanumeric characters
+  - Level H: Maximum ~1,852 alphanumeric characters
+</Accordion>
+
+<Accordion title="Scanning reliability">
+  Higher levels handle:
+  - Dirt, scratches, or damage
+  - Poor printing quality
+  - Glare or shadows
+  - Partial obstruction (like logos)
+  - Camera focus issues
+</Accordion>
+
+## Size setting
+
+The QR code size determines the dimensions in pixels:
+
+```jsx
+const [size, setSize] = useState(280);
+```
+
+<CardGroup cols={2}>
+  <Card title="Default size">
+    **Value:** 280 pixels  
+    **Display:** Optimal for on-screen viewing  
+    **Print:** Good for business cards and flyers
+  </Card>
+  <Card title="Applied to rendering">
+    **SVG preview:** 280px × 280px  
+    **PNG export:** 560px × 560px (2× resolution)  
+    **Logo size:** 62px × 62px (22% of 280px)
+  </Card>
+</CardGroup>
+
+### Size implementation
+
+Size is passed directly to both rendering components:
+
+```jsx
+<QRCodeSVG
+  value={qrValue}
+  size={size}  // 280px for preview
+  level={logoUrl ? 'H' : level}
+  // ...
+/>
+
+<QRCodeCanvas
+  value={qrValue}
+  size={size * 2}  // 560px for high-res export
+  level={logoUrl ? 'H' : level}
+  // ...
+/>
+```
+
+<Tip>
+  The PNG export uses double the size (560px) to provide high-resolution output suitable for printing.
+</Tip>
+
+## includeMargin setting
+
+The margin (quiet zone) around the QR code is essential for reliable scanning:
+
+```jsx
+<QRCodeSVG
+  value={qrValue}
+  size={size}
+  level={logoUrl ? 'H' : level}
+  bgColor={bgColor === 'transparent' ? '#ffffff' : bgColor}
+  fgColor={fgColor}
+  includeMargin={true}  // Always enabled
+  // ...
+/>
+```
+
+### Why margins matter
+
+<Warning>
+  QR codes without adequate margins may fail to scan because scanners can't determine where the code starts and ends.
+</Warning>
+
+<Steps>
+  <Step title="Scanner detection">
+    Scanners identify QR codes by finding the three position markers (corner squares)
+  </Step>
+  <Step title="Boundary definition">
+    The quiet zone defines the QR code's boundaries, separating it from surrounding content
+  </Step>
+  <Step title="Standard compliance">
+    The QR code specification requires a minimum 4-module wide white border
+  </Step>
+  <Step title="Reliable reading">
+    Margins prevent interference from nearby text, images, or other QR codes
+  </Step>
+</Steps>
+
+<Note>
+  The application always sets `includeMargin={true}` to ensure compliance with QR code standards and maximum scannability.
+</Note>
+
+## When to use each quality level
+
+Choose your error correction level based on the deployment scenario:
+
+### Level L (Normal)
+
+<Card title="Best for:" icon="check">
+  - Digital displays only (websites, apps)
+  - Clean, controlled environments
+  - Maximum data capacity needed
+  - High-quality printing on smooth surfaces
+</Card>
+
+### Level M (Good)
+
+<Card title="Best for:" icon="check">
+  - General purpose applications
+  - Indoor printed materials
+  - Business documents
+  - Standard marketing materials
+</Card>
+
+### Level Q (High)
+
+<Card title="Best for:" icon="check">
+  - Outdoor signage
+  - Rough or textured surfaces
+  - Long-term displays subject to wear
+  - Environments with variable lighting
+</Card>
+
+### Level H (Maximum)
+
+<Card title="Best for:" icon="check">
+  - QR codes with logos (required)
+  - Industrial applications
+  - Harsh environments
+  - Small print sizes
+  - When maximum reliability is critical
+</Card>
+
+<Tip>
+  Start with level H (the default) for most applications. It provides excellent reliability with minimal trade-offs for typical use cases.
+</Tip>
+
+## Automatic quality enforcement
+
+The application intelligently manages quality settings:
+
+```jsx
+level={logoUrl ? 'H' : level}
+```
+
+When you add a logo, the error correction level automatically switches to 'H', regardless of your manual selection. This ensures:
+
+- Logo area (22%) fits within error correction tolerance (30%)
+- QR code remains scannable with logo present
+- Consistent behavior across all export formats
+- No user intervention required
+
+<Warning>
+  If you remove the logo, the error correction level returns to your manually selected value. Always verify your quality setting after removing logos.
+</Warning>
+
+## Quality and file size
+
+Error correction level affects export file sizes:
+
+<CardGroup cols={2}>
+  <Card title="SVG exports">
+    Higher levels create more complex patterns with more vector paths, slightly increasing file size
+  </Card>
+  <Card title="PNG exports">
+    More complex patterns may compress differently, but the effect is minimal for typical QR codes
+  </Card>
+</CardGroup>
+
+The difference is usually negligible compared to the benefits of improved scannability.

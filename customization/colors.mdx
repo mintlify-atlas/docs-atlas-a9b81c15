@@ -1,0 +1,160 @@
+---
+title: Color customization
+description: Customize QR code colors with foreground and background options for brand consistency and optimal scannability
+---
+
+Generador QR Pro provides full color customization for your QR codes, allowing you to match your brand identity while maintaining excellent scannability.
+
+## How color customization works
+
+The application uses two primary color states to control the appearance of your QR codes:
+
+<CardGroup cols={2}>
+  <Card title="Foreground color" icon="palette">
+    The color of the QR code pattern itself (the dark squares and modules)
+  </Card>
+  <Card title="Background color" icon="fill">
+    The color behind the QR code pattern
+  </Card>
+</CardGroup>
+
+## Color state implementation
+
+The color values are managed through React state with hex color format:
+
+```jsx
+const [fgColor, setFgColor] = useState('#0f172a');
+const [bgColor, setBgColor] = useState('#ffffff');
+```
+
+The default foreground color is `#0f172a` (slate-900, a dark blue-gray), and the default background is `#ffffff` (white).
+
+## Color picker interface
+
+The application provides an intuitive color picker interface for both colors:
+
+```jsx
+<div className="form-group color-group">
+  <div>
+    <label className="form-label">Color del QR</label>
+    <div className="color-picker-wrapper">
+      <input type="color" value={fgColor} onChange={(e) => setFgColor(e.target.value)} />
+      <span className="color-hex">{fgColor}</span>
+    </div>
+  </div>
+  <div>
+    <label className="form-label">Fondo</label>
+    <div className="color-picker-wrapper">
+      <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
+      <span className="color-hex">{bgColor}</span>
+    </div>
+  </div>
+</div>
+```
+
+<Steps>
+  <Step title="Select color">
+    Click on the color picker input to open your browser's native color selector
+  </Step>
+  <Step title="Preview hex value">
+    The selected hex color code displays next to the picker for reference
+  </Step>
+  <Step title="Instant preview">
+    QR code updates in real-time as you change colors
+  </Step>
+</Steps>
+
+## Hex color format
+
+All colors are stored and displayed in hexadecimal format (e.g., `#4f46e5`). The hex value is shown alongside the color picker for easy copying and reference.
+
+The color picker wrapper provides a unified interface:
+- 60px wide color input
+- Hex code display with monospace font
+- Border styling that highlights on focus
+- Smooth transitions between states
+
+## QR code generation with colors
+
+Colors are applied to both the SVG and Canvas rendering:
+
+```jsx
+<QRCodeSVG
+  value={qrValue}
+  size={size}
+  level={logoUrl ? 'H' : level}
+  bgColor={bgColor === 'transparent' ? '#ffffff' : bgColor}
+  fgColor={fgColor}
+  includeMargin={true}
+  // ...
+/>
+```
+
+<Note>
+  The background color defaults to white if set to transparent, ensuring QR codes remain scannable across different display contexts.
+</Note>
+
+## Best practices for scannable QR codes
+
+<Warning>
+  Insufficient contrast between foreground and background colors can make QR codes difficult or impossible to scan.
+</Warning>
+
+Follow these guidelines for optimal scannability:
+
+### Contrast requirements
+
+<Accordion title="High contrast is essential">
+  Aim for a contrast ratio of at least 3:1 between foreground and background colors. Dark foreground on light background works best.
+</Accordion>
+
+<Accordion title="Avoid similar colors">
+  Don't use colors that are too close in brightness or hue (e.g., light gray on white, or dark blue on black).
+</Accordion>
+
+<Accordion title="Test before production">
+  Always test your QR codes with a real scanner under different lighting conditions before printing or publishing.
+</Accordion>
+
+### Recommended color combinations
+
+<CardGroup cols={2}>
+  <Card title="Classic">
+    **Foreground:** Black (#000000)  
+    **Background:** White (#ffffff)  
+    Maximum contrast and reliability
+  </Card>
+  <Card title="Brand colors">
+    **Foreground:** Dark brand color  
+    **Background:** Light or white  
+    Maintains identity while ensuring scannability
+  </Card>
+  <Card title="Inverted">
+    **Foreground:** White (#ffffff)  
+    **Background:** Dark color  
+    Works well on dark surfaces or designs
+  </Card>
+  <Card title="Accent colors">
+    **Foreground:** Deep accent  
+    **Background:** Light neutral  
+    Adds visual interest with good contrast
+  </Card>
+</CardGroup>
+
+<Tip>
+  The glow effect behind the QR preview adapts to your foreground color, providing visual feedback that changes dynamically based on your color selection.
+</Tip>
+
+## Visual feedback
+
+The application provides visual feedback through the glow effect:
+
+```jsx
+<div className="qr-glow" style={{ 
+  backgroundColor: fgColor !== '#ffffff' && fgColor !== '#000000' 
+    ? fgColor 
+    : 'var(--accent-color)' 
+}}></div>
+```
+
+This creates an attractive ambient glow that matches your foreground color (unless it's pure white or black, in which case it uses the default accent color).

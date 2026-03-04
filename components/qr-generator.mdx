@@ -1,0 +1,472 @@
+---
+title: QRGenerator component
+description: Core component that handles QR code generation, template switching, customization, and export functionality
+---
+
+The `QRGenerator` component is the main component of Generador QR Pro. It manages QR code generation across multiple templates (URL, WiFi, vCard, Email), provides real-time preview with customization options, and handles export to PNG and SVG formats.
+
+## Component architecture
+
+The QRGenerator component is a self-contained React functional component that combines state management, template-based form rendering, and dual QR code rendering for display and export purposes.
+
+```jsx
+import React, { useState, useRef, useEffect } from 'react';
+import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
+import { Download, QrCode, Settings2, Link as LinkIcon, Wifi, User, Mail, Image as ImageIcon, Trash2 } from 'lucide-react';
+
+export default function QRGenerator() {
+  // Component implementation
+}
+```
+
+**File location:** `src/components/QRGenerator.jsx:1-283`
+
+## State management
+
+The component manages 11 state variables using React's `useState` hook to control templates, data inputs, and customization options.
+
+### Template and navigation state
+
+<ParamField path="activeTab" type="string" default="'url'">
+  Controls which template form is displayed. Possible values: `'url'`, `'wifi'`, `'vcard'`, `'email'`
+</ParamField>
+
+### Data states
+
+Each template has its own dedicated state object:
+
+<ParamField path="urlData" type="string" default="'https://www.bbc.com/mundo'">
+  Stores the URL or text content for the URL template
+</ParamField>
+
+<ParamField path="wifiData" type="object">
+  WiFi network configuration object
+  
+  ```javascript
+  {
+    ssid: '',        // Network name
+    password: '',    // Network password
+    encryption: 'WPA', // Security type: 'WPA', 'WEP', or 'nopass'
+    hidden: false    // Whether network is hidden
+  }
+  ```
+</ParamField>
+
+<ParamField path="vcardData" type="object">
+  Contact information for vCard template
+  
+  ```javascript
+  {
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    company: ''
+  }
+  ```
+</ParamField>
+
+<ParamField path="emailData" type="object">
+  Email composition data for mailto links
+  
+  ```javascript
+  {
+    to: '',      // Recipient email
+    subject: '', // Email subject
+    body: ''     // Email body
+  }
+  ```
+</ParamField>
+
+### Customization states
+
+<ParamField path="fgColor" type="string" default="'#0f172a'">
+  Foreground color (QR code modules) in hex format
+</ParamField>
+
+<ParamField path="bgColor" type="string" default="'#ffffff'">
+  Background color in hex format
+</ParamField>
+
+<ParamField path="size" type="number" default="280">
+  QR code size in pixels for the SVG preview (PNG exports at 2x resolution)
+</ParamField>
+
+<ParamField path="level" type="string" default="'H'">
+  Error correction level: `'L'` (7%), `'M'` (15%), `'Q'` (25%), or `'H'` (30%)
+</ParamField>
+
+<ParamField path="logoUrl" type="string" default="''">
+  Data URL of the uploaded logo image. Empty string means no logo.
+</ParamField>
+
+### Computed state
+
+<ParamField path="qrValue" type="string" default="''">
+  The computed QR code content based on active template and its data. Updated by useEffect.
+</ParamField>
+
+<ParamField path="qrRef" type="React.RefObject">
+  Ref to the QR preview container, used to access SVG/Canvas elements for export
+</ParamField>
+
+## Tab system for template switching
+
+The component implements a tab-based UI to switch between four QR code templates:
+
+```jsx
+<div className="tabs-container">
+  <button className={`tab-btn ${activeTab === 'url' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('url')}>
+    <LinkIcon size={18} /> URL
+  </button>
+  <button className={`tab-btn ${activeTab === 'wifi' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('wifi')}>
+    <Wifi size={18} /> WiFi
+  </button>
+  <button className={`tab-btn ${activeTab === 'vcard' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('vcard')}>
+    <User size={18} /> Contacto
+  </button>
+  <button className={`tab-btn ${activeTab === 'email' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('email')}>
+    <Mail size={18} /> Email
+  </button>
+</div>
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:92-105`
+
+Each tab button updates the `activeTab` state, triggering a re-render that displays the corresponding form and updates the QR value via the useEffect hook.
+
+## QR value computation logic
+
+The component uses a `useEffect` hook to automatically compute the QR code content whenever the active template or its data changes:
+
+```jsx
+useEffect(() => {
+  switch (activeTab) {
+    case 'url':
+      setQrValue(urlData || 'https://');
+      break;
+    case 'wifi':
+      setQrValue(`WIFI:S:${wifiData.ssid};T:${wifiData.encryption};P:${wifiData.password};H:${wifiData.hidden};;`);
+      break;
+    case 'vcard':
+      const vcard = `BEGIN:VCARD\nVERSION:3.0\nN:${vcardData.lastName};${vcardData.firstName};;;\nFN:${vcardData.firstName} ${vcardData.lastName}\nORG:${vcardData.company}\nTEL;TYPE=CELL:${vcardData.phone}\nEMAIL:${vcardData.email}\nEND:VCARD`;
+      setQrValue(vcard);
+      break;
+    case 'email':
+      setQrValue(`mailto:${emailData.to}?subject=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`);
+      break;
+    default:
+      setQrValue('');
+  }
+}, [activeTab, urlData, wifiData, vcardData, emailData]);
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:26-44`
+
+<Note>
+  The WiFi format follows the standard `WIFI:S:ssid;T:encryption;P:password;H:hidden;;` specification that most QR code readers recognize for automatic network connection.
+</Note>
+
+### Data format specifications
+
+<Tabs>
+  <Tab title="URL">
+    Simple string value, defaults to `'https://'` if empty
+    
+    ```javascript
+    setQrValue(urlData || 'https://');
+    ```
+  </Tab>
+  
+  <Tab title="WiFi">
+    Follows the WiFi QR Code standard format
+    
+    ```javascript
+    `WIFI:S:${ssid};T:${encryption};P:${password};H:${hidden};;`
+    ```
+    
+    - `S`: SSID (network name)
+    - `T`: Encryption type (WPA, WEP, nopass)
+    - `P`: Password
+    - `H`: Hidden network (true/false)
+  </Tab>
+  
+  <Tab title="vCard">
+    vCard 3.0 format for contact information
+    
+    ```javascript
+    `BEGIN:VCARD
+    VERSION:3.0
+    N:${lastName};${firstName};;;
+    FN:${firstName} ${lastName}
+    ORG:${company}
+    TEL;TYPE=CELL:${phone}
+    EMAIL:${email}
+    END:VCARD`
+    ```
+  </Tab>
+  
+  <Tab title="Email">
+    Mailto URL with encoded parameters
+    
+    ```javascript
+    `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    ```
+  </Tab>
+</Tabs>
+
+## Form rendering based on active tab
+
+The component conditionally renders different form inputs based on the `activeTab` state:
+
+```jsx
+<div className="tab-content animate-fade-in" key={activeTab}>
+  {activeTab === 'url' && (
+    <div className="form-group">
+      <label className="form-label">Contenido / URL</label>
+      <input type="text" 
+             value={urlData} 
+             onChange={(e) => setUrlData(e.target.value)} 
+             placeholder="https://..." />
+    </div>
+  )}
+
+  {activeTab === 'wifi' && (
+    <div className="grid-2-cols">
+      <div className="form-group">
+        <label className="form-label">Nombre de Red (SSID)</label>
+        <input type="text" 
+               value={wifiData.ssid} 
+               onChange={(e) => setWifiData({ ...wifiData, ssid: e.target.value })} 
+               placeholder="Mi Red WiFi" />
+      </div>
+      {/* Additional WiFi fields */}
+    </div>
+  )}
+  
+  {/* vcard and email forms */}
+</div>
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:108-170`
+
+The `key={activeTab}` prop triggers a fade-in animation when switching templates, providing smooth visual feedback.
+
+## QRCodeSVG vs QRCodeCanvas usage
+
+The component renders **both** a visible SVG and a hidden Canvas element to support dual export formats:
+
+### Visible SVG for preview and vector export
+
+```jsx
+<QRCodeSVG
+  value={qrValue}
+  size={size}
+  level={logoUrl ? 'H' : level}
+  bgColor={bgColor === 'transparent' ? '#ffffff' : bgColor}
+  fgColor={fgColor}
+  includeMargin={true}
+  imageSettings={logoUrl ? {
+    src: logoUrl,
+    x: undefined,
+    y: undefined,
+    height: size * 0.22,
+    width: size * 0.22,
+    excavate: true,
+  } : undefined}
+/>
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:230-245`
+
+### Hidden Canvas for PNG export
+
+```jsx
+<div style={{ display: 'none' }}>
+  <QRCodeCanvas
+    value={qrValue}
+    size={size * 2}
+    level={logoUrl ? 'H' : level}
+    bgColor={bgColor}
+    fgColor={fgColor}
+    includeMargin={true}
+    imageSettings={logoUrl ? {
+      src: logoUrl, 
+      height: (size * 2) * 0.22, 
+      width: (size * 2) * 0.22, 
+      excavate: true,
+    } : undefined}
+  />
+</div>
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:247-259`
+
+<Note>
+  The Canvas is rendered at 2x resolution (size * 2) to produce high-quality PNG exports, while the SVG maintains the base size for efficient preview rendering.
+</Note>
+
+### Why dual rendering?
+
+<Expandable title="Technical explanation">
+  - **QRCodeSVG**: Provides vector output that can be serialized and downloaded as .svg files, allowing infinite scaling without quality loss
+  - **QRCodeCanvas**: Required for PNG export because browsers can only convert Canvas elements to raster images via `toDataURL()`
+  - Both components use identical props to ensure visual consistency between formats
+  - The Canvas is hidden (`display: 'none'`) to avoid duplicate visual elements
+</Expandable>
+
+## Real-time preview with styling
+
+The QR code preview updates instantly as users modify any state:
+
+```jsx
+<div className="qr-wrapper" ref={qrRef} style={{ backgroundColor: bgColor }}>
+  {/* QR code elements */}
+</div>
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:228-260`
+
+### Dynamic glow effect
+
+The preview includes a decorative glow effect that adapts to the foreground color:
+
+```jsx
+<div className="qr-glow" 
+     style={{ 
+       backgroundColor: fgColor !== '#ffffff' && fgColor !== '#000000' 
+         ? fgColor 
+         : 'var(--accent-color)' 
+     }}>
+</div>
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:224`
+
+### Logo integration
+
+When a logo is uploaded, the component:
+1. Forces error correction level to 'H' (30%) to ensure scannability with logo obstruction
+2. Centers the logo at 22% of the QR code size
+3. Uses `excavate: true` to remove QR modules behind the logo, preventing scan interference
+
+```jsx
+imageSettings={logoUrl ? {
+  src: logoUrl,
+  height: size * 0.22,
+  width: size * 0.22,
+  excavate: true,
+} : undefined}
+```
+
+## Export handlers
+
+### PNG export
+
+Converts the hidden Canvas element to a PNG data URL and triggers download:
+
+```jsx
+const handleDownloadPNG = () => {
+  const canvas = qrRef.current?.querySelector('canvas');
+  if (!canvas) return;
+
+  const pngUrl = canvas
+    .toDataURL("image/png")
+    .replace("image/png", "image/octet-stream");
+  
+  let downloadLink = document.createElement("a");
+  downloadLink.href = pngUrl;
+  downloadLink.download = "qr-premium.png";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+};
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:47-58`
+
+### SVG export
+
+Serializes the visible SVG element to a blob and downloads as vector file:
+
+```jsx
+const handleDownloadSVG = () => {
+  const svg = qrRef.current?.querySelector('svg');
+  if (!svg) return;
+
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  let downloadLink = document.createElement("a");
+  downloadLink.href = url;
+  downloadLink.download = "qr-premium-vector.svg";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  URL.revokeObjectURL(url);
+};
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:60-75`
+
+<Note>
+  The SVG handler properly cleans up the object URL using `revokeObjectURL` to prevent memory leaks.
+</Note>
+
+### Logo upload handler
+
+Reads uploaded image files and converts them to data URLs:
+
+```jsx
+const handleLogoUpload = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (event) => setLogoUrl(event.target.result);
+    reader.readAsDataURL(file);
+  }
+};
+```
+
+**Implementation:** `src/components/QRGenerator.jsx:77-84`
+
+## Dependencies
+
+The component relies on these external packages:
+
+- **qrcode.react** (v4.2.0): Provides `QRCodeSVG` and `QRCodeCanvas` components
+- **lucide-react** (v0.576.0): Icon library for UI elements (Download, QrCode, Settings2, etc.)
+- **react** (v19.2.0): Core React library for hooks and component rendering
+
+## Usage in application
+
+The QRGenerator component is rendered directly in the App component:
+
+```jsx
+import React from 'react';
+import QRGenerator from './components/QRGenerator';
+
+function App() {
+  return (
+    <div className="container animate-fade-in">
+      <header className="header">
+        <h1 className="title">Generador QR Pro</h1>
+        <p className="subtitle">
+          Crea, personaliza y descarga códigos QR con un diseño premium al instante.
+        </p>
+      </header>
+      
+      <main>
+        <QRGenerator />
+      </main>
+    </div>
+  );
+}
+```
+
+**File location:** `src/App.jsx:1-20`
