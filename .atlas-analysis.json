@@ -1,0 +1,74 @@
+{
+  "projectType": "frontend",
+  "projectName": "Generador QR Pro",
+  "projectDescription": "A modern React QR code generator with customizable templates, styling options, and premium export capabilities.",
+  "theme": "almond",
+  "primaryColor": "#4f46e5",
+  "lightColor": "#f1f5f9",
+  "darkColor": "#0f172a",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "quickstart",
+          "installation"
+        ]
+      },
+      {
+        "group": "QR Templates",
+        "pages": [
+          "templates/url",
+          "templates/wifi",
+          "templates/vcard",
+          "templates/email"
+        ]
+      },
+      {
+        "group": "Customization",
+        "pages": [
+          "customization/colors",
+          "customization/logo",
+          "customization/quality",
+          "customization/export"
+        ]
+      },
+      {
+        "group": "Components",
+        "pages": [
+          "components/qr-generator",
+          "components/props-api"
+        ]
+      },
+      {
+        "group": "Examples",
+        "pages": [
+          "examples/basic",
+          "examples/advanced",
+          "examples/integration"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Multiple QR code templates (URL, WiFi, vCard, Email)",
+    "Real-time preview with customizable colors and styling",
+    "Logo overlay support with high error correction",
+    "Export to PNG and SVG formats",
+    "Modern glass morphism UI design",
+    "Built with React 19 and Vite"
+  ],
+  "publicApiSurface": [
+    "QRGenerator component",
+    "URL template with text input",
+    "WiFi template with SSID, password, and encryption options",
+    "vCard template with contact information fields",
+    "Email template with recipient, subject, and body",
+    "Color customization (foreground and background)",
+    "Logo upload and integration",
+    "Quality level settings (L, M, Q, H)",
+    "PNG export function",
+    "SVG export function"
+  ]
+}
